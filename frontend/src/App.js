@@ -22,6 +22,26 @@ import socketIOClient from 'socket.io-client';
 
 
 function App() {
+  // State to manage socket connection
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    // Initiating socket connection
+    const newSocket = socketIOClient(API_BASE_URL);
+    newSocket.on('connect', () => {
+      console.log('Connected to server');
+    });
+    newSocket.on('disconnect', () => {
+      console.log('Disconnected from server');
+    });
+    setSocket(newSocket);
+
+    // Cleaning up the connection on unmount
+    return () => {
+      console.log('Closing socket connection');
+      newSocket.close();
+    };
+  }, []);
 
   return (
     <AuthProvider>
