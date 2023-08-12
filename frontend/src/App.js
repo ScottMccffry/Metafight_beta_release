@@ -55,12 +55,12 @@ function App() {
             <Routes>
               {/* Defining the various routes of the application */}
               <Route path="/" element={<Home />} />
-              <Route path="/marketplace" element={<Marketplace socket={socket} />} />
+              <Route path="/marketplace" element={<Marketplace />} />
               <Route path="/profile/:walletAddress" element={<Profile />} />
-              <Route path="/live-feed" element={<LiveFeed socket={socket}/>} />
-              <Route path="/fight/:fightId" element={<Fight socket={socket}/>} />
+              <Route path="/live-feed" element={<LiveFeed />} />
+              <Route path="/fight/:fightId" element={<Fight />} />
               <Route path="/mint" element={<MintingPage />} />
-              <Route path="/nft/:nftAddress" element={<Nft socket={socket}/>} />
+              <Route path="/nft/:nftAddress" element={<Nft />} />
               <Route path="/stacking" element={<Stacking />} />
               <Route path="/training" element={<Training />} />
             </Routes>
