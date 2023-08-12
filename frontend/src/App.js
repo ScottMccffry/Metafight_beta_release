@@ -2,11 +2,11 @@
 // Importing required modules for routing and layout
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './components/header/Header';
-import SideBarLeft from './components/sideBarLeft/SideBarLeft';
-import Home from './pages/Home/Home';
-import Marketplace from './pages/Marketplace/Marketplace';
-import LiveFeed from './pages/LiveFeed/LiveFeed';
-import Fight from './pages/Fight/Fight';
+import SideBarLeft from './components/sideBarLeft/sideBarLeft';
+import Home from './pages/home/home';
+import Marketplace from './pages/marketplace/marketplace';
+import LiveFeed from './pages/liveFeed/liveFeed';
+import Fight from './pages/fight/fight';
 import styles from './App.css' // Importing CSS for the app
 import WalletProvider from './context/WalletProvider'; // Context for wallet
 import AuthProvider from './context/AuthProvider'; // Context for authentication
@@ -15,6 +15,7 @@ import Profile from './pages/Profile/Profile';
 import Stacking from './pages/Stacking/Stacking';
 import Training from './pages/Training/Training';
 import Nft from './pages/Nft/Nft';
+import { SocketProvider } from './context/SocketContext';
 
 // Importing hooks and socket.io client
 import { useEffect, useState } from 'react';
@@ -46,6 +47,7 @@ function App() {
   return (
     <AuthProvider>
       <WalletProvider>
+        <SocketProvider>
         <Router>
           <body className="text-zinc-200 w-screen h-full">
             <SideBarLeft />
@@ -66,6 +68,7 @@ function App() {
           {/* Adding a script for styling */}
           <script src="../../node_modules/flowbite/dist/flowbite.min.js"></script>
         </Router>
+        </SocketProvider>
       </WalletProvider>
     </AuthProvider>
   );
