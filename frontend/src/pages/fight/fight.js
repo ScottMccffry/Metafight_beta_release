@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import BetsHistory from '../../components/betsHistory/BetsHistory';
-import LiveStream from '../../components/liveStream/LiveStream';
-import TwitchChat from '../../components/twitchChat/TwitchChat';
-import LiveData from '../../components/liveData/LiveData';
-import SideBarRightBet from '../../components/sideBarRightBet/SideBarRightBet';
+import BetsHistory from '../../components/betsHistory/betsHistory';
+import LiveStream from '../../components/liveStream/liveStream';
+import TwitchChat from '../../components/twitchChat/twitchChat';
+import LiveData from '../../components/liveData/liveData';
+import SideBarRightBet from '../../components/sideBarRightBet/sideBarRightBet';
 
 // Define the Fight component
 const Fight = () => {
