@@ -29,6 +29,7 @@ const BetsHistory = ({ betsHistoryIn, fightData}) => {
       fetchBetsHistory();
     }
   }, [betsHistoryIn, fightId]);
+    // Are we putting a socket ? 
   return (
 
 
