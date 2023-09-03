@@ -21,7 +21,7 @@ import { SocketProvider } from './context/SocketContext';
 import { useEffect, useState } from 'react';
 import socketIOClient from 'socket.io-client';
 
-
+const API_BASE_URL = process.env.REACT_APP_API_BASE_UR
 function App() {
   // State to manage socket connection
   const [socket, setSocket] = useState(null);

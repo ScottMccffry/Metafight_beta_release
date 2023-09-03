@@ -1,6 +1,6 @@
 // LiveFeed.js
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import socketIOClient from 'socket.io-client';
 import SideBarRight from '../../components/sideBarRight/sideBarRight';
 import SideBarRightBet from '../../components/sideBarRightBet/sideBarRightBet';

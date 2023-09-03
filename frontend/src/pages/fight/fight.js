@@ -9,6 +9,7 @@ import TwitchChat from '../../components/twitchChat/twitchChat';
 import LiveData from '../../components/liveData/liveData';
 import SideBarRightBet from '../../components/sideBarRightBet/sideBarRightBet';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_UR
 // Define the Fight component
 const Fight = () => {
   // Retrieve location and fight data from location state
