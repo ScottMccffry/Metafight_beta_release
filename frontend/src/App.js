@@ -1,7 +1,7 @@
 //App.js
 // Importing required modules for routing and layout
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Header from './components/header/Header';
+import Header from './components/header/header';
 import SideBarLeft from './components/sideBarLeft/sideBarLeft';
 import Home from './pages/home/home';
 import Marketplace from './pages/marketplace/marketplace';
@@ -10,11 +10,11 @@ import Fight from './pages/fight/fight';
 import styles from './App.css' // Importing CSS for the app
 import WalletProvider from './context/WalletProvider'; // Context for wallet
 import AuthProvider from './context/AuthProvider'; // Context for authentication
-import MintingPage from './pages/MintingPage/MintingPage';
-import Profile from './pages/Profile/Profile';
-import Stacking from './pages/Stacking/Stacking';
-import Training from './pages/Training/Training';
-import Nft from './pages/Nft/Nft';
+import MintingPage from './pages/minting/minting';
+import Profile from './pages/profile/profile';
+import Stacking from './pages/staking/staking';
+import Training from './pages/training/training';
+import Nft from './pages/nft/nft';
 import { SocketProvider } from './context/SocketContext';
 
 // Importing hooks and socket.io client

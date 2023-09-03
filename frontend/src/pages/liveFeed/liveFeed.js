@@ -5,7 +5,7 @@ import socketIOClient from 'socket.io-client';
 import SideBarRight from '../../components/sideBarRight/sideBarRight';
 import SideBarRightBet from '../../components/sideBarRightBet/sideBarRightBet';
 import ContentFight from '../../components/contents/contentFight/contentFight';
-import Items from '../../components/items/Items';
+import Items from '../../components/items/items';
 
 const LiveFeed = () => {
   const [showBetSidebar, setShowBetSidebar] = useState(false);

@@ -10,7 +10,7 @@ const WalletProvider = ({ children }) => {
     const checkConnection = async () => {
       if (typeof window.ethereum !== 'undefined') {
         try {
-          let provider = new ethers.BrowserProvider(window.ethereum);
+          let provider = new ethers.providers(window.ethereum);
           const signer = provider.getSigner();
           const account = await signer.getAddress();
           if (account) {
@@ -50,7 +50,7 @@ const WalletProvider = ({ children }) => {
         if (!window.ethereum.selectedAddress) {
           await window.ethereum.request({ method: 'eth_requestAccounts' });
         }
-        let provider = new ethers.BrowserProvider(window.ethereum)
+        let provider = new ethers.providers(window.ethereum)
         const signer = provider.getSigner();
         const account = await signer.getAddress();
         setIsConnected(true);
