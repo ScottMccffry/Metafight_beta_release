@@ -1,5 +1,5 @@
 import React from 'react';
-import ArtworkSelector from '../artworkSelector/ArtworkSelector';
+import ArtworkSelector from '../../artworkSelector/artworkSelector';
 function Content() {
   return (
     <div className="">

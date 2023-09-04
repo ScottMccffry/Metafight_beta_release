@@ -1,5 +1,4 @@
 import React from 'react';
-import ArtworkSelector from '../artworkSelector/ArtworkSelector';
 function ContentCharacterGenerator() {
   return (
     <div className="w-4/5">

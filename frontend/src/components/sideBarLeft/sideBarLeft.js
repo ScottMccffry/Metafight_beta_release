@@ -1,6 +1,6 @@
 // Importing necessary modules and components
 import React from 'react';
-import SidebarItem from '../sideBarItem/sideBarItem';
+import SidebarItem from '../sideBarItem/sideBarItem.js';
 import { Link, useLocation } from 'react-router-dom';
 import AuthContext from '../../../../frontend/src/context/AuthContext';
 import axios from 'axios';
@@ -48,7 +48,13 @@ function SidebarLeft() {
         {/* Mapping through the sidebar items and rendering them */}
         {[
           { key: 'dashboard', link: '/' },
-          // ... more items
+          { key: 'market', link: '/marketplace' },
+          { key: 'live', link: '/live-feed' },
+          { key: 'mint', link: '/mint' },
+          { key: 'training', link: '/training' },
+          { key: 'stacking', link: '/stacking' },
+          { key: 'wallet', link: '/wallet' },
+          { key: 'settings', link: '/settings' },
         ].map(({ key, link }, index) => (
           <li key={key}>
             <Link to={link}>

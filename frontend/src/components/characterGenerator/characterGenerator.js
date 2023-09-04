@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import MFT from '../../artifacts/contracts/MetaFight.sol/MetaFight.json'
+//import MFT from '../../artifacts/contracts/MetaFight.sol/MetaFight.json'
 import { ethers } from 'ethers';
 import { create } from 'ipfs-http-client';
 
@@ -186,11 +186,11 @@ const createCombinedImage = async () => {
   const combinedImageUrl = canvas.toDataURL('image/png');
   return combinedImageUrl;
 };
-
+{/*
 const mintNFT = async () => {
   if(typeof window.ethereum !== 'undefined') {
     let accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
-    const provider = new ethers.BrowserProvider(window.ethereum);
+    const provider = new ethers.providers(window.ethereum);
     const signer = provider.getSigner();
     const contract = new ethers.Contract(MFTaddress, MFT.abi, signer);
     try {
@@ -232,6 +232,7 @@ const mintNFT = async () => {
   // Interact with your smart contract to mint the NFT and include the metadata
   // Add your smart contract interaction code 
 };
+*/}
   // Function to toggle the open/close status of the Fighter accordion
   
 
@@ -512,7 +513,8 @@ const mintNFT = async () => {
       </div>
       <div className="text-center mt-4">
         <p>Total Price: {price} ETH</p>
-        <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded" onClick={mintNFT}>
+        {/* <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded" onClick={mintNFT}> */}
+        <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded" >
           Mint NFT
         </button>
       </div>
