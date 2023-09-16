@@ -1,7 +1,7 @@
 // Import required hooks and libraries
 import { useContext, useState, useEffect } from 'react';
 import { SelectedCardContext } from '../../../../frontend/src/context/SelectedCardContext';
-import FighterSpecs from '../fighterSpecs/FighterSpecs';
+import FighterSpecs from '../fighterSpecs/fighterSpecs';
 // Contexts for authentication and wallet
 import AuthContext from '../../context/AuthContext';
 import WalletContext from '../../context/WalletContext';

@@ -55,7 +55,7 @@ const Icons = {
     </svg>
   ),
 };
-function SidebarItem({ text, index, active }) {
+function sideBarItem({ text, index, active }) {
   return (
     <li className="relative">
       {active ? (
@@ -86,4 +86,4 @@ function SidebarItem({ text, index, active }) {
     </li>
   );
 }
-export default SidebarItem;
+export default sideBarItem;
