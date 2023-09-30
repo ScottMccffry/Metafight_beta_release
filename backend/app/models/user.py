@@ -15,7 +15,7 @@ class Users(db.Model):
     def to_dict(self):
         return {
             'username': self.username,
-            'walletAdress': self.walletAdress,
+            'walletAdress': self.walletAddress,
             'email': self.email,
             'image': self.image,
             'funds': self.funds,

@@ -51,7 +51,7 @@ const BetsHistory = ({ betsHistoryIn, fightData}) => {
                 <td className="px-6 py-4">{bet.fighter_nft_address}</td>
                 <td className="px-6 py-4">{bet.amount}</td>
                 <td className="px-6 py-4">{bet.odd}</td>
-                <td className="px-6 py-4">{bet.wallet_adress}</td>
+                <td className="px-6 py-4">{bet.wallet_address}</td>
               </tr>
             ))}
           </tbody>

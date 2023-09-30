@@ -60,7 +60,7 @@ def place_bet():
         fighter_nft_address=data['selectedFighter'],
         amount=data['betAmount'],
         odd=data['odd'],
-        wallet_adress=data['walletAddress']
+        wallet_address=data['walletAddress']
     )
     
     print(f"Created Bet: {bet}")
@@ -77,8 +77,8 @@ def place_bet():
         print("Updated fight betting_pool1")
         # Create a new transaction for betting pool 1
         transaction = Transactions(
-        fromWalletAdress=data['walletAddress'],
-        toWalletAdress=fight.betting_pool1_id,  
+        fromWalletAddress=data['walletAddress'],
+        toWalletAddress=fight.betting_pool1_id,  
         amount=data['betAmount']
     )
     else:
@@ -86,8 +86,8 @@ def place_bet():
         print("Updated fight betting_pool2")
         # Create a new transaction for betting pool 2
         transaction = Transactions(
-        fromWalletAdress=data['walletAddress'],
-        toWalletAdress=fight.betting_pool2_id, 
+        fromWalletAddress=data['walletAddress'],
+        toWalletAddress=fight.betting_pool2_id, 
         amount=data['betAmount']
     )
     
@@ -96,7 +96,7 @@ def place_bet():
     print("Added transaction to the session")
     
     # Deduct the bet amount from user's balance
-    user = Users.query.filter_by(walletAdress=data['walletAddress']).first()
+    user = Users.query.filter_by(walletAddress=data['walletAddress']).first()
     print(f"Fetched user: {user}")
     user.funds -= data['betAmount']
     print("Deducted bet amount from user's balance")

@@ -8,7 +8,7 @@ import FighterSpecs from '../../components/fighterSpecs/fighterSpecs';
 import SaleData from '../../components/saleData/saleData';
 import CardStackTraining from '../../components/cardStackTraining/cardStackTraining';
 import TrainingOptions from '../../components/trainingOptions/trainingOptions';
-import ContentTraining from '../../components/contentTraining/contentTraining';
+import ContentTraining from '../../components/contents/contentTraining/contentTraining';
 
 const API_BASE_URL = 'http://127.0.0.1:5000';
 

@@ -44,3 +44,14 @@ def wait_for_confirmations(transaction_hash, num_confirmations):
         if latest_block - transaction['blockNumber'] >= num_confirmations:
             return
         time.sleep(1)  # Wait a bit before trying again
+        
+def wait_for_confirmations(transaction_hash, num_confirmations):
+    provider = providers.JsonRpcProvider("http://localhost:8545")  # This assumes you're connecting to a local Ethereum node. Modify the URL if needed.
+
+    while True:
+        transaction = provider.getTransaction(transaction_hash)
+        latest_block = provider.getBlockNumber()
+
+        if latest_block - transaction['blockNumber'] >= num_confirmations:
+            return
+        time.sleep(1)

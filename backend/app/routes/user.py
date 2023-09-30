@@ -25,7 +25,7 @@ def logout():
 #User profile information fetch
 @user_routes.route('/profile/<wallet_address>', methods=['GET'])
 def get_user_from_address(wallet_address):
-    user = Users.query.filter_by(walletAdress=wallet_address).first()
+    user = Users.query.filter_by(walletAddress=wallet_address).first()
     if user is None:
         return jsonify({'error': 'User not found'}), 404
     else:
