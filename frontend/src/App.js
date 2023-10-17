@@ -19,30 +19,10 @@ import { SocketProvider } from './context/SocketContext';
 
 // Importing hooks and socket.io client
 import { useEffect, useState } from 'react';
-import socketIOClient from 'socket.io-client';
+
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_UR
 function App() {
-  // State to manage socket connection
-  const [socket, setSocket] = useState(null);
-
-  useEffect(() => {
-    // Initiating socket connection
-    const newSocket = socketIOClient(API_BASE_URL);
-    newSocket.on('connect', () => {
-      console.log('Connected to server');
-    });
-    newSocket.on('disconnect', () => {
-      console.log('Disconnected from server');
-    });
-    setSocket(newSocket);
-
-    // Cleaning up the connection on unmount
-    return () => {
-      console.log('Closing socket connection');
-      newSocket.close();
-    };
-  }, []);
 
   return (
     <AuthProvider>
@@ -65,7 +45,7 @@ function App() {
               <Route path="/training" element={<Training />} />
             </Routes>
           </body>
-          {/* Adding a script for styling */}
+          {/* Adding script for styling */}
           <script src="../../node_modules/flowbite/dist/flowbite.min.js"></script>
         </Router>
         </SocketProvider>

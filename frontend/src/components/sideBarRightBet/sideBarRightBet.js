@@ -3,7 +3,7 @@ import { useState, useContext, useEffect} from 'react';
 import axios from 'axios';
 import WalletContext from '../../../../frontend/src/context/WalletContext';
 import AuthContext from '../../../../frontend/src/context/AuthContext';
-import {SocketContext} from '../../../../frontend/src/context/SocketContext';
+import {SocketContext} from '../../context/SocketContext';
 
 import styles from './sideBarRightBet.module.css';
 

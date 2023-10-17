@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import Countdown from 'https://cdn.skypack.dev/react-countdown';
 import { useNavigate } from 'react-router-dom';
+import { SocketContext } from '../../context/SocketContext'
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 
@@ -93,10 +94,12 @@ function FightItem({ id, fighter1, fighter2, odd1, odd2, time_left, onBetClick }
   );
 }
 
-function Items({ onBetClick, socket }) {
+function Items({ onBetClick}) {
   console.log('Items component rendered');
   const [fights, setFights] = useState([]);
   const [fighters, setFighters] = useState([]);
+  const socket = useContext(SocketContext);
+
   {/* const requestedUpdates = useRef(new Set()); Store IDs of fights that have requested updates */}
 
 
@@ -137,9 +140,7 @@ function Items({ onBetClick, socket }) {
     };
   }, [socket]);
 
-  useEffect(() => {
-    console.log(fights);
-  }, [fights]);
+
   useEffect(() => {
     async function fetchFights() {
       const response = await axios.get(`${API_BASE_URL}/api/fights?limit=10`);

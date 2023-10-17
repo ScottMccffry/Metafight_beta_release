@@ -5,7 +5,7 @@ import json
 class Bids(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     bid_amount = db.Column(db.Float, nullable=False)
-    user_nft_address = db.Column(db.String(255), db.ForeignKey('users.walletAdress'), nullable=False)
+    user_nft_address = db.Column(db.String(255), db.ForeignKey('users.walletAddress'), nullable=False)
     marketplace_item_id = db.Column(db.Integer, db.ForeignKey('NFTmarketplace.id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 

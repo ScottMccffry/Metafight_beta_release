@@ -5,7 +5,7 @@ from datetime import datetime
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(255), nullable=False)
-    walletAdress = db.Column(db.String(255), nullable=False)
+    walletAddress = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
     image = db.Column(db.String(255), nullable=False)
@@ -15,7 +15,7 @@ class Users(db.Model):
     def to_dict(self):
         return {
             'username': self.username,
-            'walletAdress': self.walletAddress,
+            'walletAddress': self.walletAddress,
             'email': self.email,
             'image': self.image,
             'funds': self.funds,

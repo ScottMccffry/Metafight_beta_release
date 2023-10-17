@@ -6,7 +6,7 @@ class Bets(db.Model):
     fighter_nft_address = db.Column(db.String(255), db.ForeignKey('fighter.nft_address'), nullable=False)
     amount = db.Column(db.Integer, nullable=False)
     odd = db.Column(db.Float, nullable=False) 
-    wallet_adress = db.Column(db.String(42), nullable=False)
+    wallet_address = db.Column(db.String(42), nullable=False)
          
    #use marshmallow on update
     def to_dict(self):
@@ -16,5 +16,5 @@ class Bets(db.Model):
             'fighter_nft_address': self.fighter_nft_address,
             'amount': self.amount,
             'odd': self.odd,  
-            'wallet_adress': self.wallet_adress
+            'wallet_address': self.wallet_address
         }      

@@ -6,7 +6,7 @@ class Fighter(db.Model):
     name = db.Column(db.String(255), nullable=False)
     collection_address = db.Column(db.String(255), db.ForeignKey('nf_tcollections.address'), nullable=True)  # Updated field
     image = db.Column(db.String(255), nullable=False)
-    owner_nft_address = db.Column(db.Integer, db.ForeignKey('users.walletAdress'), nullable=True)  # Updated field
+    owner_nft_address = db.Column(db.Integer, db.ForeignKey('users.walletAddress'), nullable=True)  # Updated field
     nft_address = db.Column(db.String(255), unique=True, nullable=False)
     marketplace_item = db.relationship('NFTmarketplace', uselist=False, back_populates='fighter')  # Updated relationship
     game_characteristics_json = db.Column(db.String(250), nullable=False)

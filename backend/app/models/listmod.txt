@@ -1,0 +1,338 @@
+
+
+=== Content from /Users/armandfatalot/Desktop/Metafight_beta_release/backend/app/models/bets.py ===
+
+from app.database import db
+
+class Bets(db.Model):
+    id= db.Column(db.Integer, primary_key=True, unique=True)
+    fight_id = db.Column(db.Integer, db.ForeignKey('fight.id'), nullable=False)
+    fighter_nft_address = db.Column(db.String(255), db.ForeignKey('fighter.nft_address'), nullable=False)
+    amount = db.Column(db.Integer, nullable=False)
+    odd = db.Column(db.Float, nullable=False) 
+    wallet_adress = db.Column(db.String(42), nullable=False)
+         
+   #use marshmallow on update
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'fight_id': self.fight_id,
+            'fighter_nft_address': self.fighter_nft_address,
+            'amount': self.amount,
+            'odd': self.odd,  
+            'wallet_adress': self.wallet_adress
+        }      
+
+
+=== Content from /Users/armandfatalot/Desktop/Metafight_beta_release/backend/app/models/gamestatistics.py ===
+
+from app.database import db
+
+class GameStatistics(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fight_id = db.Column(db.Integer, db.ForeignKey('fight.id'), primary_key=True, unique=True)
+    totalGames= db.Column(db.Integer, nullable=False, default=0)
+    totalWinsFighter1 = db.Column(db.Integer, nullable=False, default=0)
+    totalWinsFighter2 = db.Column(db.Integer, nullable=False, default=0)
+    fight= db.relationship('Fight', foreign_keys=[fight_id])
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'fightId': self.fightId,
+            'totalGames': self.totalGames,
+            'totalWinsFighter1': self.totalWinsFighter1,
+            'totalWinsFighter2': self.totalWinsFighter2
+        }
+
+=== Content from /Users/armandfatalot/Desktop/Metafight_beta_release/backend/app/models/user.py ===
+
+from app.database import db
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+
+class Users(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(255), nullable=False)
+    walletAddress = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(64), unique=True, index=True)
+    password_hash = db.Column(db.String(128))
+    image = db.Column(db.String(255), nullable=False)
+    funds = db.Column(db.Float, nullable=False)
+    fighters = db.relationship('Fighter', backref='user', lazy=True)  # New relationship
+
+    def to_dict(self):
+        return {
+            'username': self.username,
+            'walletAddress': self.walletAddress,
+            'email': self.email,
+            'image': self.image,
+            'funds': self.funds,
+            'fighters': [fighter.to_dict() for fighter in self.fighters]  # Include owned fighters
+        }
+    @property
+    def password(self):
+        raise AttributeError('password is not a readable attribute')
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+=== Content from /Users/armandfatalot/Desktop/Metafight_beta_release/backend/app/models/listmod.txt ===
+
+
+
+=== Content from /Users/armandfatalot/Desktop/Metafight_beta_release/backend/app/models/fighterspecs.py ===
+
+from app.database import db
+
+class fighterspecs(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fighterId = db.Column(db.Integer, db.ForeignKey('fighter.id'))
+    totalGames = db.Column(db.Integer, nullable=False)
+    totalWinsFighter1 = db.Column(db.Integer, nullable=False)
+    sound_url = db.Column(db.String(255), nullable=False)
+    sprite_sheet_url = db.Column(db.String(255), nullable=False)
+    animation_steps = db.Column(db.String(255), nullable=False)
+    size = db.Column(db.Integer, nullable=False)
+    scale = db.Column(db.Integer, nullable=False)
+    offset = db.Column(db.String(255), nullable=False)
+    league = db.Column(db.String(255), nullable=False)
+    
+
+    def __repr__(self):
+        return f"GameStatistics('{self.id}', '{self.fightId}', '{self.totalGames}', '{self.totalWinsFighter1}', '{self.totalWinsFighter2}')"
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "fightId": self.fightId,
+            "totalGames": self.totalGames,
+            "totalWinsFighter1": self.totalWinsFighter1,
+        }
+        
+
+=== Content from /Users/armandfatalot/Desktop/Metafight_beta_release/backend/app/models/bids.py ===
+
+from app.database import db
+from datetime import datetime
+import json
+
+class Bids(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    bid_amount = db.Column(db.Float, nullable=False)
+    user_nft_address = db.Column(db.String(255), db.ForeignKey('users.walletAdress'), nullable=False)
+    marketplace_item_id = db.Column(db.Integer, db.ForeignKey('NFTmarketplace.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('Users', foreign_keys=[user_nft_address])
+    marketplace_item = db.relationship('NFTmarketplace', foreign_keys=[marketplace_item_id])
+
+    def to_dict(self, include_user=True, include_marketplace_item=True):
+        data = {
+            'id': self.id,
+            'bid_amount': self.bid_amount,
+            'user_nft_address': self.user_nft_address,
+            'marketplace_item_id': self.marketplace_item_id,
+            'timestamp': self.timestamp.isoformat() + 'Z',  # Convert to ISO 8601 format
+        }
+
+        if include_user:
+            data['user'] = self.user.to_dict() if self.user else None
+
+        if include_marketplace_item:
+            data['marketplace_item'] = self.marketplace_item.to_dict() if self.marketplace_item else None
+
+        return data
+
+
+=== Content from /Users/armandfatalot/Desktop/Metafight_beta_release/backend/app/models/fightrequest.py ===
+
+from app.database import db
+from datetime import datetime
+
+class FightRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer, nullable=False)
+    fighter_id = db.Column(db.Integer, db.ForeignKey('fighter.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    fighter = db.relationship('Fighter')    
+
+
+=== Content from /Users/armandfatalot/Desktop/Metafight_beta_release/backend/app/models/transactions.py ===
+
+from app.database import db
+
+class Transactions(db.Model):
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    #option of adding polymorphic relationship
+    #but first we do without foreign key
+    fromWalletAdress = db.Column(db.String(255), nullable=False)
+    toWalletAdress = db.Column(db.String(255), nullable=False)
+    amount= db.Column(db.Integer, nullable=False)
+    
+    
+    def to_dict(self):
+        return {
+            'fromWalletAdress': self.fromWalletAdress,
+            'toWalletAdress': self.toWalletAdress,
+            'amount': self.amount
+        }
+            
+
+=== Content from /Users/armandfatalot/Desktop/Metafight_beta_release/backend/app/models/fight.py ===
+
+from app.database import db
+
+class Fight(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fighter1_nft_address = db.Column(db.String(255), db.ForeignKey('fighter.nft_address'), nullable=False)
+    fighter2_nft_address = db.Column(db.String(255), db.ForeignKey('fighter.nft_address'), nullable=False)
+    odd1 = db.Column(db.Float, nullable=False)
+    odd2 = db.Column(db.Float, nullable=False)
+    time_left = db.Column(db.Integer, nullable=False)
+    #option of adding polymorphic relationship
+    betting_pool1_id= db.Column(db.Integer , nullable=False, unique=True)
+    betting_pool2_id = db.Column(db.Integer, nullable=False, unique=True)
+    betting_pool1 = db.Column(db.Integer, nullable=False, default=0) 
+    betting_pool2 = db.Column(db.Integer, nullable=False, default=0)
+    fighter1 = db.relationship('Fighter', foreign_keys=[fighter1_nft_address])
+    fighter2 = db.relationship('Fighter', foreign_keys=[fighter2_nft_address])
+    
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'fighter1_nft_address': self.fighter1_nft_address,
+            'fighter2_nft_address': self.fighter2_nft_address,
+            'odd1': self.odd1,
+            'odd2': self.odd2,   
+            'time_left': self.time_left,
+            'betting_pool1_id': self.betting_pool1_id,
+            'betting_pool2_id': self.betting_pool2_id, 
+            'betting_pool1': self.betting_pool1,  
+            'betting_pool2': self.betting_pool2, 
+            'fighter1': self.fighter1.to_dict() if self.fighter1 else None,
+            'fighter2': self.fighter2.to_dict() if self.fighter2 else None
+        }
+        
+        # je pense qu'on peut enlever la save method
+def save(self):
+    db.session.add(self)
+    db.session.flush()
+
+    # Update the fight betting pool
+    fight = Fight.query.get(self.fight_id)
+    if fight.fighter1_nft_address == self.fighter_nft_address:
+        fight.betting_pool1 += self.amount
+    else:
+        fight.betting_pool2 += self.amount
+
+    db.session.commit()
+
+
+=== Content from /Users/armandfatalot/Desktop/Metafight_beta_release/backend/app/models/__init__.py ===
+
+from .user import Users
+from .nftcollections import NFTcollections
+from .fighter import Fighter
+from .nftmarketplace import NFTmarketplace
+from .fight import Fight
+from .fightrequest import FightRequest
+from .bets import Bets
+from .transactions import Transactions
+from .gamestatistics import GameStatistics
+from .bids import Bids
+
+=== Content from /Users/armandfatalot/Desktop/Metafight_beta_release/backend/app/models/nftcollections.py ===
+
+from app.database import db
+
+class NFTcollections(db.Model):
+    __tablename__ = 'nf_tcollections' # This should match the actual table name in the database
+    id = db.Column(db.Integer, primary_key=True)
+    address = db.Column(db.String(255), nullable=False, unique=True)
+    abi = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+    fighters = db.relationship('Fighter', backref='nft_collections', lazy=True)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'address': self.address,
+            'abi': self.abi,
+            'name': self.name,
+            'description': self.description,
+            # 'fighters': [fighter.to_dict() for fighter in self.fighters]
+        }
+
+=== Content from /Users/armandfatalot/Desktop/Metafight_beta_release/backend/app/models/nftmarketplace.py ===
+
+from app.database import db
+
+class NFTmarketplace(db.Model):
+    __tablename__ = 'NFTmarketplace'
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    nft_address = db.Column(db.String(42), db.ForeignKey('fighter.nft_address'), nullable=False, unique=True) 
+    auction = db.Column(db.Boolean , nullable=False, default=True)
+    timeLeft = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Float, nullable=True)
+    fighter = db.relationship('Fighter', back_populates='marketplace_item',  lazy='joined')  # New relationship
+    
+    def to_dict(self, include_fighter=True):
+        return {
+            'id': self.id,
+            'nft_address': self.nft_address,
+            'auction': self.auction,
+            'timeLeft': self.timeLeft,
+            'price': self.price,
+        }
+        if include_fighter:
+            data['fighter'] = self.fighter.to_dict(include_marketplace_item=False) if self.fighter else None
+        return data
+
+=== Content from /Users/armandfatalot/Desktop/Metafight_beta_release/backend/app/models/fighter.py ===
+
+from app.database import db
+import json
+
+class Fighter(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    collection_address = db.Column(db.String(255), db.ForeignKey('nf_tcollections.address'), nullable=True)  # Updated field
+    image = db.Column(db.String(255), nullable=False)
+    owner_nft_address = db.Column(db.Integer, db.ForeignKey('users.walletAdress'), nullable=True)  # Updated field
+    nft_address = db.Column(db.String(255), unique=True, nullable=False)
+    marketplace_item = db.relationship('NFTmarketplace', uselist=False, back_populates='fighter')  # Updated relationship
+    game_characteristics_json = db.Column(db.String(250), nullable=False)
+    handler = db.Column(db.String(255), nullable=False)
+    rank = db.Column(db.Integer, nullable=False)
+    @property
+    def game_characteristics(self):
+        return json.loads(self.game_characteristics_json)
+
+    @game_characteristics.setter
+    def game_characteristics(self, value):
+        self.game_characteristics_json = json.dumps(value)
+        
+        
+    def to_dict(self, include_marketplace_item=True):
+        data = {
+            'id': self.id,
+            'name': self.name,
+            'collection_address': self.collection_address if self.collection_address else None,  # Updated line
+            'image': self.image,
+            'owner_nft_address': self.owner_nft_address,
+            'rank': self.rank,
+            'nft_address': self.nft_address,
+            'game_characteristics': self.game_characteristics_json,
+            'handler': self.handler
+        }
+        if include_marketplace_item:
+            data['marketplace_item'] = (self.marketplace_item.to_dict(include_fighter=False) if self.marketplace_item else None)
+        return data

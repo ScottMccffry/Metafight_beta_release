@@ -18,7 +18,7 @@ users = [
     {
         "id": i+1,
         "username": fake.user_name(),
-        "walletAdress": fake.uuid4(),
+        "walletAddress": fake.uuid4(),
         "email": fake.email(),
         "image": fake.image_url(),
         "funds": round(random.uniform(100, 10000), 1)
@@ -78,7 +78,7 @@ with app.app_context():
 
 # Get all fighter ids
     fighter_nft_addresses = Fighter.query.with_entities(Fighter.nft_address).all()
-    user_wallet_addresses = Users.query.with_entities(Users.walletAdress).all()
+    user_wallet_addresses = Users.query.with_entities(Users.walletAddress).all()
     betting_pool_ids = Fight.query.with_entities(Fight.betting_pool1_id, Fight.betting_pool2_id).all()
 # random data for fights
 # random data for GameStatistics
@@ -157,7 +157,7 @@ bets = [
         "fighter_nft_address": random.choice([fight['fighter1_nft_address'], fight['fighter2_nft_address']]),
         "amount": random.randint(100, 1000),
         "odd": round(random.uniform(1, 3), 1),
-        "wallet_adress": fake.uuid4(),
+        "wallet_Address": fake.uuid4(),
     }
     for i in range(100)
 ]
@@ -167,25 +167,25 @@ for i in range(100):
     # Combine the user wallet addresses and betting pool ids into one list
     all_addresses = user_wallet_addresses + betting_pool_ids
 
-    # Choose the fromWalletAdress randomly from all_addresses
+    # Choose the fromWalletAddress randomly from all_addresses
     from_wallet_address = random.choice(all_addresses)[0]
 
     # Choose a fight
     fight = random.choice(fights)
 
-    # If the fromWalletAdress is a betting pool id, the toWalletAdress should be the other betting pool id
+    # If the fromWalletAddress is a betting pool id, the toWalletAddress should be the other betting pool id
     if from_wallet_address == fight['betting_pool1_id']:
         to_wallet_address = fight['betting_pool2_id']
     elif from_wallet_address == fight['betting_pool2_id']:
         to_wallet_address = fight['betting_pool1_id']
-    # Otherwise, the toWalletAdress can be any address from all_addresses
+    # Otherwise, the toWalletAddress can be any address from all_addresses
     else:
         to_wallet_address = random.choice(all_addresses)[0]
     
     transactions.append({
         "id": i+1,
-        "fromWalletAdress": from_wallet_address,
-        "toWalletAdress": to_wallet_address,
+        "fromWalletAddress": from_wallet_address,
+        "toWalletAddress": to_wallet_address,
         "amountIn": random.randint(100, 1000),
         "amountOut": random.randint(100, 1000),
     })
