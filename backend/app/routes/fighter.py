@@ -13,12 +13,6 @@ def get_fighters():
     fighters_list = [fighter.to_dict() for fighter in fighters]
     return jsonify(fighters_list)
 
-@fighter_routes.route('/api/Usersfighters/<userId>', methods=['GET'])
-def get_Usersfighters(userId):
-    user = Users.query.filter_by(id=userId).first()
-    fighters = Fighter.query.filter_by(owner_nft_address=user.walletAdress).all()
-    fighters_list = [fighter.to_dict() for fighter in fighters]
-    return jsonify(fighters_list)
 
 @fighter_routes.route('/api/users_fighters_address/<user_wallet_address>', methods=['GET'])
 def get_users_fighters_Faddress(user_wallet_address):

@@ -13,7 +13,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 
 const TrainingOptions = () => {
 
-    // Access values from the Wallet and Auth contexts
+    // To take out and replace with with unified provider
     const { isConnected, connectWallet } = useContext(WalletContext);
     const { isAuthenticated, userId, loginUser } = useContext(AuthContext);
     
@@ -28,7 +28,7 @@ const TrainingOptions = () => {
             if(isAuthenticated && userId) {
                 try {
                     // API call to fetch fighters associated with the user
-                    const response = await axios.get(`${API_BASE_URL}/api/Usersfighters/${userId}`);
+                    const response = await axios.get(`${API_BASE_URL}/api/users_fighters_address/${userWalletAddress}`);
                     // Update the cardOrder state with fetched fighters
                     setCardOrder(response.data);
                 } catch (error) {
