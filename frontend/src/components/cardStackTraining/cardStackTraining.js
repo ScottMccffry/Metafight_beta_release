@@ -67,27 +67,31 @@ const CardStackTraining = () => {
 
   // Component's return (UI part)
   return (
-    <div className='h-4/5 w-4/5'>
-      <div className="flex relative h-4/5 w-4/5 items-center justify-center" onClick={changeCard}>
-        {cardOrder.map((fighter, index) => (
-          <div 
-            key={fighter.id} 
-            className={`w-full h-full absolute rounded-lg transform transition-all duration-500 ease-in-out`}
-            style={{top: `${-4*index}px`, left: `${-4*index}px` , zIndex: `${cardOrder.length - index}`}}
-          >
-            <div className="relative mt-3 pb-3/4 bg-gray-200 rounded-lg shadow-lg">
-              <img src={fighter.image} className="w-full relative z-10" alt={fighter.name} />
-            </div>
-            <hr className="my-12 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-            <div className="bg-zinc-800 p-3 rounded-b-lg flex justify-between items-center">
-              <button onClick={Stake} className="w-2/5 py-2 text-center font-medium hover:bg-gray-200 hover:text-blue-700 rounded-lg">Stake</button>
-              <button onClick={Unstake} className="w-2/5 py-2 text-center text-white font-medium bg-gray-700 rounded-lg hover:bg-blue-700">Unstake</button>
-            </div>
+    <div className="flex relative h-4/5 w-4/5 items-center justify-center" onClick={changeCard}>
+      {cardOrder.map((fighter, index) => (
+        <div 
+          key={fighter.id} 
+          className={`w-full h-full absolute rounded-lg transform transition-all duration-500 ease-in-out`}
+          style={{
+            top: '50%', 
+            left: '50%', 
+            transform: `translate(-50%, -50%) translateX(-${4*index}px) translateY(-${4*index}px)`, 
+            zIndex: `${cardOrder.length - index}`
+          }}
+        >
+          <div className="relative mt-3 pb-3/4 bg-gray-200 rounded-lg shadow-lg">
+            <img src={fighter.image} className="w-full relative z-10" alt={fighter.name} />
           </div>
-        ))}
-      </div>
+          <hr className="my-12 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+          <div className="bg-zinc-800 p-3 rounded-b-lg flex justify-between items-center">
+            <button onClick={Stake} className="w-2/5 py-2 text-center font-medium hover:bg-gray-200 hover:text-blue-700 rounded-lg">Stake</button>
+            <button onClick={Unstake} className="w-2/5 py-2 text-center text-white font-medium bg-gray-700 rounded-lg hover:bg-blue-700">Unstake</button>
+          </div>
+        </div>
+      ))}
     </div>
   );
+  
 }
 
 // Exporting the CardStackTraining component

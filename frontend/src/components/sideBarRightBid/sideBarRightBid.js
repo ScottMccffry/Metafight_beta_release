@@ -2,6 +2,7 @@
 import React from 'react';
 import { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
+import { SocketContext } from '../../context/SocketContext';
 
 // Context for managing the user's wallet and authentication
 import WalletContext from '../../../../frontend/src/context/WalletContext';
@@ -23,7 +24,7 @@ import Countdown from 'react-countdown';
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 
 // Define the SideBarRightBid functional component
-function SideBarRightBid({ showBetSidebar, itemBid, closeBidSidebar, socket }) {
+function SideBarRightBid({ showBetSidebar, itemBid, closeBidSidebar }) {
 
     // Local state for managing various properties of the bid process
     const [isCheckedAgreement, setIsCheckedAgreement] = React.useState(false);
@@ -32,6 +33,8 @@ function SideBarRightBid({ showBetSidebar, itemBid, closeBidSidebar, socket }) {
     const [bid, setBid] = useState(itemBid.bid);
     const [inputValue, setInputValue] = useState("");
     const [lastInputType, setLastInputType] = useState("radio");
+    const socket = useContext(SocketContext);
+
     
     // Contexts for managing user authentication and wallet connection
     const { isAuthenticated, userId, loginUser } = useContext(AuthContext);

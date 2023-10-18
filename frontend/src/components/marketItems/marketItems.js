@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Countdown from 'react-countdown';
+import { SocketContext } from '../../context/SocketContext'
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 // Component for individual market items
-function MarketItem({ marketplace_item = {}, fighter = {}, onBidClick, socket}) {
+function MarketItem({ marketplace_item = {}, fighter = {}, onBidClick}) {
     const navigate = useNavigate();
     // Destructuring properties from the passed props
     const { price, timeLeft, nft_address, id } = marketplace_item;
     const { owner, game_characteristics, image, name } = fighter;
+    const socket = useContext(SocketContext);
+
   
     // Handler for when the bid button is clicked
     const handleItemBidClick = (event, ItemBid) => {
@@ -75,9 +78,10 @@ function MarketItem({ marketplace_item = {}, fighter = {}, onBidClick, socket}) 
 }
 
 // Component for a list of market items
-function MarketItems({ onBidClick, socket }) {
+function MarketItems({ onBidClick}) {
     const [marketItems, setMarketItems] = useState([]);
-  
+    const socket = useContext(SocketContext);
+
     // Socket effect for listening to bid updates
     useEffect(() => {
       console.log('MarketItems useEffect hook ran with socket:', socket);

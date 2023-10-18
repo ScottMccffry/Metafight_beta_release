@@ -4,7 +4,7 @@ import axios from 'axios';
 // Import static image
 import DAImage from '../../assets/images/collections/DA.png';
 
-const API_BASE_URL = 'http://127.0.0.1:5000';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 
 // Component to display individual accordion items
 const AccordionItem = ({ collection }) => {

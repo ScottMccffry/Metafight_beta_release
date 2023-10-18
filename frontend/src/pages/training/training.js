@@ -10,7 +10,7 @@ import CardStackTraining from '../../components/cardStackTraining/cardStackTrain
 import TrainingOptions from '../../components/trainingOptions/trainingOptions';
 import ContentTraining from '../../components/contents/contentTraining/contentTraining';
 
-const API_BASE_URL = 'http://127.0.0.1:5000';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 
 const Training = () => {
 
@@ -23,10 +23,10 @@ const Training = () => {
       <div className="flex flex-col w-full">
       <ContentTraining/>
         <div className="flex flex-row flex-grow w-4/5 justify-center items-center h-4/5">
-            <div className="rounded-lg pb-5  h-full w-2/5 mr-1 flex items-center justify-center">
+            <div className="rounded-lg pb-5  h-full w-2/5 ml-1 flex items-center justify-center">
             <CardStackTraining/>
             </div>
-            <div className="rounded-lg w-3/5 pb-5 h-full ml-1 flex items-center justify-center pr-0">
+            <div className="rounded-lg w-3/5 pb-5 h-full mr-1 flex items-center justify-center pr-0">
               <TrainingOptions/>
             </div>
         </div>
