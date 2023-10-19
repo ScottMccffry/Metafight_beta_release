@@ -1,8 +1,7 @@
 import React from 'react';
 import { useState, useContext, useEffect} from 'react';
 import axios from 'axios';
-import WalletContext from '../../../../frontend/src/context/WalletContext';
-import AuthContext from '../../../../frontend/src/context/AuthContext';
+import UnifiedContext from '../../context/UnifiedContext';
 import {SocketContext} from '../../context/SocketContext';
 
 import styles from './sideBarRightBet.module.css';
@@ -18,8 +17,8 @@ function SideBarRightBet({ fightBet, closeBetSidebar }) {
   const [odd, setOdd] = useState(fightBet.odd); // This should be your real odd. It's 1 by default here
   const [inputValue, setInputValue] = useState("");
   const [lastInputType, setLastInputType] = useState("radio");
-  const { isAuthenticated, userId,loginUser } = useContext(AuthContext);
-  const { isConnected, connectWallet } = useContext(WalletContext);
+  const { isConnected, connectWallet, isAuthenticated, userId, loginUser } = useContext(UnifiedContext);
+
   const {socket } = useContext(SocketContext);
   const [userAccount, setUserAccount] = useState(null);
 

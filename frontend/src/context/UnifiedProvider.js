@@ -38,7 +38,7 @@ const UnifiedProvider = ({ children }) => {
   };
 
   // Wallet related functions
-  useEffect(() => {
+
     useEffect(() => {
         const checkConnection = async () => {
           if (typeof window.ethereum !== 'undefined') {
@@ -76,7 +76,7 @@ const UnifiedProvider = ({ children }) => {
           }
         };
     }, []);
-  }, []);
+  
 
   const connectWallet = async () => {
     if (window.ethereum) {

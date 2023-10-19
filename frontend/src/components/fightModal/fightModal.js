@@ -1,12 +1,12 @@
 // Importing necessary hooks and utilities from React and other libraries
 import React, { useState, useEffect, useContext } from 'react';
-import WalletContext from '../../context/WalletContext';
+import UnifiedContext from '../../context/UnifiedContext';
 import axios from 'axios';
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 // `FightModal` component definition
-const FightModal = ({ isConnected, closeModal }) => {
+const FightModal = ({  closeModal }) => {
   // Accessing connected user's ID from the WalletContext
-  const { connectedUserId } = useContext(WalletContext);
+  const { isConnected, connectWallet, isAuthenticated, userId, loginUser } = useContext(UnifiedContext);
 
   // State management for the list of NFT collections and the selected NFT
   const [nftCollections, setNftCollections] = useState([]);
@@ -44,7 +44,7 @@ const FightModal = ({ isConnected, closeModal }) => {
     try {
       // Making a POST request to start the fight process
       await axios.post('/api/request_fight', {
-        player_id: connectedUserId,
+        player_id: userId,
         nft_id: selectedNft,
       });
     } catch (error) {

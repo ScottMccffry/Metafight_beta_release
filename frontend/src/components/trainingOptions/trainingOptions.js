@@ -3,8 +3,7 @@ import { useContext, useState, useEffect } from 'react';
 import { SelectedCardContext } from '../../../../frontend/src/context/SelectedCardContext';
 import FighterSpecsTraining from '../fighterSpecsTraining/fighterSpecsTraining';
 // Contexts for authentication and wallet
-import AuthContext from '../../context/AuthContext';
-import WalletContext from '../../context/WalletContext';
+import UnifiedContext from '../../context/UnifiedContext';
 import axios from 'axios';
 
 // Array of predefined colors
@@ -14,8 +13,8 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 const TrainingOptions = () => {
 
     // To take out and replace with with unified provider
-    const { isConnected, connectWallet } = useContext(WalletContext);
-    const { isAuthenticated, userId, loginUser } = useContext(AuthContext);
+    const { isConnected, connectWallet, isAuthenticated, userId, loginUser } = useContext(UnifiedContext);
+
     
     // State to handle the order of the cards
     const [cardOrder, setCardOrder] = useState(colors);
@@ -28,9 +27,9 @@ const TrainingOptions = () => {
             if(isAuthenticated && userId) {
                 try {
                     // API call to fetch fighters associated with the user
-                    const response = await axios.get(`${API_BASE_URL}/api/users_fighters_address/${userWalletAddress}`);
+                    //const response = await axios.get(`${API_BASE_URL}/api/users_fighters_address/${userWalletAddress}`);
                     // Update the cardOrder state with fetched fighters
-                    setCardOrder(response.data);
+                   // setCardOrder(response.data);
                 } catch (error) {
                     console.log('API call failed with error:', error);
                 }

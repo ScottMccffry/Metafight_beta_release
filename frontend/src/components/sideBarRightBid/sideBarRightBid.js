@@ -5,8 +5,7 @@ import axios from 'axios';
 import { SocketContext } from '../../context/SocketContext';
 
 // Context for managing the user's wallet and authentication
-import WalletContext from '../../../../frontend/src/context/WalletContext';
-import AuthContext from '../../../../frontend/src/context/AuthContext';
+import UnifiedContext from '../../context/UnifiedContext';
 
 // Socket.io client for real-time functionality
 import io from 'socket.io-client';
@@ -37,8 +36,8 @@ function SideBarRightBid({ showBetSidebar, itemBid, closeBidSidebar }) {
 
     
     // Contexts for managing user authentication and wallet connection
-    const { isAuthenticated, userId, loginUser } = useContext(AuthContext);
-    const { isConnected, connectWallet } = useContext(WalletContext);
+    const { isConnected, connectWallet, isAuthenticated, userId, loginUser } = useContext(UnifiedContext);
+
 
     // User's account details
     const [userAccount, setUserAccount] = useState(null);

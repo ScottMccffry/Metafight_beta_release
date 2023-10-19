@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
-import WalletContext from '../../../context/WalletContext';
+import UnifiedContext from '../../../context/UnifiedContext';
 import FightModal from '../../fightModal/fightModal';
 
 // Define the base URL for the API
@@ -10,7 +10,7 @@ function ContentFight() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   
   // Get the `isConnected` value from the WalletContext
-  const { isConnected } = useContext(WalletContext);
+  const { isConnected } = useContext(UnifiedContext);
 
   // Handler for the button click event
   const handleButtonClick = () => {

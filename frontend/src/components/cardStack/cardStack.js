@@ -1,8 +1,8 @@
 // Importing necessary hooks and modules
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import WalletContext from '../../../../frontend/src/context/WalletContext';
-import AuthContext from '../../../../frontend/src/context/AuthContext';
+import UnifiedContext from '../../context/UnifiedContext';
+
 
 // Predefined array of colors
 const colors = ["green", "yellow", "red", "black", "purple", "white"];
@@ -11,11 +11,9 @@ const colors = ["green", "yellow", "red", "black", "purple", "white"];
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 
 const CardStack = () => {
-  // Using WalletContext to get wallet related data and functions
-  const { isConnected, connectWallet } = useContext(WalletContext);
-  // Using AuthContext to get authentication related data and functions
-  const { isAuthenticated, userId, loginUser } = useContext(AuthContext);
-  
+
+  const { isConnected, connectWallet, isAuthenticated, userId, loginUser } = useContext(UnifiedContext);
+
   // State to keep track of card order
   const [cardOrder, setCardOrder] = useState(colors);
 

@@ -2,10 +2,9 @@
 import React from 'react';
 import SidebarItem from '../sideBarItem/sideBarItem.js';
 import { Link, useLocation } from 'react-router-dom';
-import AuthContext from '../../../../frontend/src/context/AuthContext';
 import axios from 'axios';
 import { useContext } from 'react';
-
+import UnifiedContext from '../../context/UnifiedContext.js';
 // Setting the API base URL
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 
@@ -24,7 +23,7 @@ function SidebarLeft() {
   // Using the useLocation hook to get the current URL location
   const location = useLocation();
   // Destructuring logoutUser from AuthContext
-  const { logoutUser } = useContext(AuthContext);
+  const { logoutUser } = useContext(UnifiedContext);
 
   // Check if the provided link matches the current URL pathname
   const isActive = (link) => location.pathname === link;
