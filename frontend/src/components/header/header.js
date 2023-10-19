@@ -1,7 +1,6 @@
 // Importing necessary hooks, utilities, and styles from React, other libraries, and local modules
 import React, { useContext, useState, useEffect, useCallback } from 'react';
-import WalletContext from '../../../../frontend/src/context/WalletContext';
-import AuthContext from '../../../../frontend/src/context/AuthContext';
+import UnifiedContext from '../../context/UnifiedContext';
 import { useNavigate } from 'react-router-dom';
 import styles from './header.css';
 import axios from 'axios';
@@ -11,8 +10,8 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 // `Header` component definition
 function Header() {
   // Context hooks to get wallet and authentication states and functions
-  const { isConnected, connectWallet } = useContext(WalletContext);
-  const { isAuthenticated, userId, loginUser } = useContext(AuthContext);
+  const { isConnected, connectWallet, isAuthenticated, userId, loginUser } = useContext(UnifiedContext);
+
   
   // State hooks for user data, various popups, login details, errors, and dropdowns
   const [userData, setUserData] = useState(null);
@@ -99,8 +98,11 @@ function Header() {
 
   // Handler function to submit the login form
   const handleSubmit = async (event) => {
+    console.log('debug0')
     event.preventDefault();
     try {
+      console.log('debug1')
+
       const userIdFromLogin = await loginUser(email, password);
       if (userIdFromLogin) {
         await fetchUserData(userIdFromLogin); // Use the `userId` from the login to fetch user data

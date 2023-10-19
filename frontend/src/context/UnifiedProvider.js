@@ -3,7 +3,7 @@ import axios from 'axios';
 import { ethers } from 'ethers';
 import UnifiedContext from './UnifiedContext';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL ;
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:5000' ;
 
 const UnifiedProvider = ({ children }) => {
   // Authentication related states
@@ -16,7 +16,10 @@ const UnifiedProvider = ({ children }) => {
 
   // Authentication related functions
   const loginUser = async (email, password) => {
+    console.log("This is a message");
     try {
+      
+
       const response = await axios.post(`${API_BASE_URL}/api/users/login`, { email, password });
       localStorage.setItem('user', JSON.stringify(response.data));
       setIsAuthenticated(true);

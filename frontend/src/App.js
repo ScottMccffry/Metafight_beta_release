@@ -19,6 +19,7 @@ import { SocketProvider } from './context/SocketContext';
 
 // Importing hooks and socket.io client
 import { useEffect, useState } from 'react';
+import UnifiedProvider from './context/UnifiedProvider';
 
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_UR
