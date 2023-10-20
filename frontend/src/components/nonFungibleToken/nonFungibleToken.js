@@ -86,7 +86,7 @@ const NonFungibleToken = ({ fighterCharacteristicsIn, nftDataIn, viewSaleClick, 
     </div>
     <div className="flex justify-between p-3">
       <p><b>Price:</b> ETH {price}</p>
-      {/*<p>($3,565.48)</p>*/}   
+   
        </div>
     <div className="bg-zinc-800 p-3 rounded-b-lg flex justify-between items-center">
      <button onClick={viewSpecsClick} className="w-2/5 py-2 text-center font-medium hover:bg-gray-200 hover:text-blue-700 rounded-lg">View specs</button>

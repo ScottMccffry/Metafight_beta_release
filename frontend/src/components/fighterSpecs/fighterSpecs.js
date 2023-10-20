@@ -32,7 +32,7 @@ const FighterSpecs = () => {
                         data: [2112, 2343, 2545, 3423, 2365, 1985, 987],
                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
                         borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
+                        borderWidth: 2
                     }]
                 },
                 options: {}
@@ -50,8 +50,8 @@ const FighterSpecs = () => {
 
     // Component's render
     return (
-        <>
-            <div className="ml-1">
+      
+            <div className="ml-1 w-9/10 ">
                 <div className="flex justify-between text-sm font-medium">
                     {/* Owner details */}
                     <div className="flex space-x-2">
@@ -62,7 +62,7 @@ const FighterSpecs = () => {
                         </div>
                     </div>
                     {/* Creator details */}
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-2 mr-2">
                         <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
                         <div className="flex flex-col justify-center text-right">
                             <span className="text-xs text-gray-400">Created by</span>
@@ -73,7 +73,7 @@ const FighterSpecs = () => {
                 {/* Canvas for the radar chart */}
                 <canvas ref={canvasRef} />
                 {/* Bid section */}
-                <div className="w-9/10  p-2 border-4 rounded-3xl border-gray-400 mt-4">
+                <div className="w-3/4  p-2 border-4 rounded-3xl border-gray-400 mt-10">
                     <div className="flex flex-row justify-between w-full ">
                         <div className="bg-zinc-600 shadow rounded-lg p-1 sm:p-3 xl:p-5 w-1/2 mr-1">
                             <div className="flex items-center">
@@ -96,7 +96,7 @@ const FighterSpecs = () => {
                     <button type="button" className=" mt-1 text-white bg-blue-900 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-200 dark:focus:ring-blue-900 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex justify-center w-full text-center">Place Bid</button>
                 </div>
             </div>
-        </>
+    
     );
 }
 

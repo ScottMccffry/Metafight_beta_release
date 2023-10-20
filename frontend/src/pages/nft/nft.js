@@ -7,7 +7,8 @@ import FighterSpecs from '../../components/fighterSpecs/fighterSpecs';
 import SaleData from '../../components/saleData/saleData';
 
 // Define the base URL for API requests
-const API_BASE_URL = 'http://127.0.0.1:5000';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
+
 
 // Create the Nft component
 const Nft = () => {
@@ -65,13 +66,13 @@ const Nft = () => {
 
   // Render the Nft component
   return (
-    <div className="flex flex-col md:flex-row h-full">
+    <div className="flex flex-col md:flex-row">
       <div className="w-48 hidden lg:block shrink-0" />
-      <div className="flex flex-row flex-grow mt-3 w-full justify-center items-center mt-4 h-full">
+      <div className="flex flex-row flex-grow mt-3 w-full justify-center items-center mt-4">
         <div className="bg-zinc-800 rounded-lg pb-5 pt-5 w-2/5 mr-1">
           {nftData && <NonFungibleToken nftData={nftData} fighterCharacteristics={fighterCharacteristics} viewSpecsClick={viewSpecsClick} viewSaleClick={viewSaleClick} />}
         </div>
-        <div className="bg-zinc-800 rounded-lg w-2/5 pb-5 pt-5 h-full ml-1">
+        <div className="bg-zinc-800 rounded-lg w-2/5 pb-5 pt-5 h-full ml-1 ">
           {showSaleData && !showfighterSpecs && <SaleData />}
           {!showSaleData && showfighterSpecs && <FighterSpecs />}
         </div>
