@@ -31,7 +31,7 @@ function ItemsProfile({userData}) {
 
   // Render the component
   return (
-    <div className="p-6 flex flex-wrap justify-center h-90 border-">
+    <div className="p-6 flex flex-wrap justify-center h-90 bg-zinc-900">
       {/* Iterate over each NFT to display them */}
       {nfts.map(({ id, name, collection, image, rank, nft_address, game_characteristics, handler }) => (
         <div key={id} className="border-2 border-zinc-600 m-4 overflow-hidden rounded-lg shadow-lg relative transition-transform transform hover:-translate-y-2 h-96" style={{ width: 300 }}>

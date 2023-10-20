@@ -26,9 +26,9 @@ const FighterSpecs = () => {
             chartRef.current = new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                    labels: ['Physical Damage', 'Magical Damage', 'Health Points ', 'Armor', 'Magic Resistance', 'Speed',  'Attack Range'],
                     datasets: [{
-                        label: 'Traffic',
+                        label: 'Traffic',// possible to remove the label ? 
                         data: [2112, 2343, 2545, 3423, 2365, 1985, 987],
                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
                         borderColor: 'rgba(255, 99, 132, 1)',
@@ -51,8 +51,8 @@ const FighterSpecs = () => {
     // Component's render
     return (
       
-            <div className="ml-1 w-9/10 ">
-                <div className="flex justify-between text-sm font-medium">
+            <div className="ml-1 w-9/10 flex flex-col items-center justify-center">
+                <div className="flex justify-between text-sm font-medium w-full">
                     {/* Owner details */}
                     <div className="flex space-x-2">
                         <div className="w-12 h-12 bg-gray-200 rounded-full"></div>

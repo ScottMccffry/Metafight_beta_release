@@ -81,7 +81,7 @@ const LiveData = ({ fightData, onBetClick }) => {
 
   // Render the LiveData component
   return (
-    <div className="flex items-center justify-center w-full ">
+    <div className="flex items-center justify-center w-full h-full">
       {/* Live data display */}
       <div className="bg-zinc-800  flex flex-col min-w-[200px] rounded-lg shadow-md">
         {/* Live data header */}

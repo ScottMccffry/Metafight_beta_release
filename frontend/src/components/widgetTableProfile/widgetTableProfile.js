@@ -1,11 +1,11 @@
 function WidgetTableProfile() {
     return (
-<div className="mt-4 w-full grid grid-cols-2 grid-rows-2 gap-4">
+<div className="mt-4 w-full grid grid-cols-4 grid-rows-1 gap-4">
                   <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8">
                      <div className="flex items-center">
                         <div className="flex-shrink-0">
-                           <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900">2,340</span>
-                           <h3 className="text-base font-normal text-gray-500">New products this week</h3>
+                        <span className="text-xl sm:text-2xl leading-none font-bold text-gray-900">2,340</span>
+                        <h3 className="text-sm font-normal text-gray-500">New products this week</h3>
                         </div>
                         <div className="ml-5 w-0 flex items-center justify-end flex-1 text-green-500 text-base font-bold">
                            14.6%
@@ -18,8 +18,8 @@ function WidgetTableProfile() {
                   <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
                      <div className="flex items-center">
                         <div className="flex-shrink-0">
-                           <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900">5,355</span>
-                           <h3 className="text-base font-normal text-gray-500">Visitors this week</h3>
+                        <span className="text-xl sm:text-2xl leading-none font-bold text-gray-900">5,355</span>
+                        <h3 className="text-sm font-normal text-gray-500">Visitors this week</h3>
                         </div>
                         <div className="ml-5 w-0 flex items-center justify-end flex-1 text-green-500 text-base font-bold">
                            32.9%
@@ -32,8 +32,8 @@ function WidgetTableProfile() {
                   <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 mr-2 ">
                      <div className="flex items-center">
                         <div className="flex-shrink-0">
-                           <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900">385</span>
-                           <h3 className="text-base font-normal text-gray-500">User signups this week</h3>
+                        <span className="text-xl sm:text-2xl leading-none font-bold text-gray-900">385</span>
+                        <h3 className="text-sm font-normal text-gray-500">User signups this week</h3>
                         </div>
                         <div className="ml-5 w-0 flex items-center justify-end flex-1 text-red-500 text-base font-bold">
                            -2.7%
@@ -46,8 +46,8 @@ function WidgetTableProfile() {
                   <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 mr-2 ">
                      <div className="flex items-center">
                         <div className="flex-shrink-0">
-                           <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900">385</span>
-                           <h3 className="text-base font-normal text-gray-500">User signups this week</h3>
+                        <span className="text-xl sm:text-2xl leading-none font-bold text-gray-900">385</span>
+                        <h3 className="text-sm font-normal text-gray-500">User signups this week</h3>
                         </div>
                         <div className="ml-5 w-0 flex items-center justify-end flex-1 text-red-500 text-base font-bold">
                            -2.7%
