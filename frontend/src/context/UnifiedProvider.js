@@ -9,6 +9,7 @@ const UnifiedProvider = ({ children }) => {
   // Authentication related states
   const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('user'));
   const [userId, setUserId] = useState('');
+  const [userAddress, setUserAddress]= useState('')
 
   // Wallet related states
   const [isConnected, setIsConnected] = useState(false);
@@ -20,10 +21,12 @@ const UnifiedProvider = ({ children }) => {
     try {
       
 
-      const response = await axios.post(`${API_BASE_URL}/api/users/login`, { email, password });
+      const response = await axios.post(`${API_BASE_URL}/api/user/login`, { email, password });
       localStorage.setItem('user', JSON.stringify(response.data));
+      console.log("Server Response:", response.data); 
       setIsAuthenticated(true);
       setUserId(response.data.userId);
+      setUserAddress(response.data.userAddress)
       return response.data.userId;
     } catch (error) {
       console.error('Error during login:', error.message);
@@ -98,7 +101,7 @@ const UnifiedProvider = ({ children }) => {
   };
 
   return (
-    <UnifiedContext.Provider value={{ isAuthenticated, userId, loginUser, logoutUser, isConnected, connectedUserId, connectWallet }}>
+    <UnifiedContext.Provider value={{ isAuthenticated, userId,userAddress, loginUser, logoutUser, isConnected, connectedUserId, connectWallet }}>
       {children}
     </UnifiedContext.Provider>
   );

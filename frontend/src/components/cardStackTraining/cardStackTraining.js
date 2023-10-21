@@ -1,9 +1,9 @@
 // Importing necessary hooks and modules from React and other libraries
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import UnifiedContext from '../../context/UnifiedContext';
+import  UnifiedContext  from '../../context/UnifiedContext';
 // Importing context to keep track of the selected card
-import { SelectedCardContext } from '../../../../frontend/src/context/SelectedCardContext';
+import { SelectedCardContext } from '../../context/SelectedCardContext';
 
 // Predefined array of colors
 const colors = ["green", "yellow", "red", "black", "purple", "white"];
@@ -13,7 +13,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 
 // Defining the CardStackTraining component
 const CardStackTraining = () => {
-  const { isConnected, connectWallet, isAuthenticated, userId, loginUser } = useContext(UnifiedContext);
+  const { isConnected, connectWallet, isAuthenticated, userId, userAddress, loginUser } = useContext(UnifiedContext);
 
   // State to keep track of the card order
   const [cardOrder, setCardOrder] = useState(colors);
@@ -26,11 +26,11 @@ const CardStackTraining = () => {
 
     const fetchUserFighters = async () => {
       // Check if the user is authenticated and has a userId
-      if(isAuthenticated && userId) {
+      if(isAuthenticated && userId ) {
         console.log('Authenticated and userId exists, making API call');
         try {
           // Making an API call to fetch the user's fighters
-          const response = await axios.get(`${API_BASE_URL}/api/Usersfighters/${userId}`);
+          const response = await axios.get(`${API_BASE_URL}/api/users_fighters_address/${userAddress}`);
           console.log('API call succeeded, setting card order with fighters ', response.data);
           setCardOrder(response.data);
         } catch (error) {
@@ -42,7 +42,7 @@ const CardStackTraining = () => {
     }
   
     fetchUserFighters();
-  }, [isAuthenticated, userId]);
+  }, [isAuthenticated, userId, userAddress]);
 
   // Function to change the order of the cards
   const changeCard = () => {

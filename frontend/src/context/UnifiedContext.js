@@ -11,6 +11,7 @@ const UnifiedContext = createContext({
   // Wallet related states and functions
   isConnected: false,
   connectedUserId: '',
+  userAddress:'',
   connectWallet: () => {},
   // Add any other wallet-related functions here
 });

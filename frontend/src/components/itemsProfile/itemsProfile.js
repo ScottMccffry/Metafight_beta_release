@@ -20,7 +20,7 @@ function ItemsProfile({userData}) {
   useEffect(() => {
     const fetchNFTs = async () => {
       try {
-        const responseFighters = await axios.get(`${API_BASE_URL}/api/users_fighters_address/${userData.walletAdress}`);
+        const responseFighters = await axios.get(`${API_BASE_URL}/api/users_fighters_address/${userData.walletAddress}`);
         setNfts(responseFighters.data);  // Populate the NFTs state with the fetched data
       } catch (error) {
         console.log('error', error); // Log any errors that may arise

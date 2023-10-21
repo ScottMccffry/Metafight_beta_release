@@ -26,7 +26,7 @@ const Profile = () => {
       const fetchUserData = async () => {
         try {
           // Send a GET request to fetch user data using the walletAddress
-          const result = await axios.get(`${API_BASE_URL}/users/${walletAddress}`);
+          const result = await axios.get(`${API_BASE_URL}/api/user/profile/${walletAddress}`);
           // Update the state with the fetched user data
           setUserData(result.data);
         } catch (error) {
