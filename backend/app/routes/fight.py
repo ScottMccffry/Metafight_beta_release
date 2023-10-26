@@ -15,6 +15,7 @@ GAME_API_URL = 'http://localhost:8000/game_data'  # Replace with your actual gam
 
 fight_routes = Blueprint('fight_routes', __name__)
 
+#je pense que c'est obsolète
 @fight_routes.route('/api/createFights', methods=['POST'])
 def create_fight():
     data = request.get_json()

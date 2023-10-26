@@ -20,8 +20,8 @@ def get_collection(id):
         return {"error": "Collection not found"}, 404
     return jsonify(collection.to_dict()), 200
 
-@collection_routes.route('/create-collection', methods=['POST'])
-def create_collection():
+@collection_routes.route('/add_collection', methods=['POST'])
+def add_collection():
     data = request.get_json()
     new_collection = NFTcollections(
         id=data['id'],

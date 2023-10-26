@@ -15,7 +15,7 @@ def get_fighters():
 
 
 @fighter_routes.route('/api/users_fighters_address/<user_wallet_address>', methods=['GET'])
-def get_users_fighters_Faddress(user_wallet_address):
+def get_users_fighters_address(user_wallet_address):
 
     print(f"User Wallet Address: {user_wallet_address}")  # Print the received wallet address
 
@@ -40,113 +40,98 @@ def fetch_fighter_data(nft_address):
         return jsonify(fighter.to_dict()), 200
     else:
         return jsonify({'error': 'Fighter not found'}), 404
-# This endpoint uploads the characteristics of a new fighter it is used for the character generator component
-@fighter_routes.route('/api/upload_fighter_characteristics/<dna>', methods=['POST'])
-def upload_fighter_data(dna):
-    # Get the data from the request
-    data = request.get_json()
 
-    # If no data is provided, return a 400 bad request status
+# This endpoint uploads the characteristics of a new fighter it is used for the character generator component
+@fighter_routes.route('/api/upload_fighter_characteristics/<data>', methods=['POST'])
+def upload_fighter_data(data):
+    data = request.get_json()
     if not data:
         return jsonify({"message": "No input data provided"}), 400
 
-    # Extract the details of the fighter from the data
     name = data.get('name')
-    group = data.get('group')
+    collection_address = data.get('collection_address')
     image = data.get('image')
     nft_address = data.get('nft_address')
-    game_characteristics = data.get('game_characteristics')
+    game_characteristics_json = data.get('game_characteristics_json')
+    handler = data.get('handler')
+    rank = data.get('rank')
+    owner_nft_address = data.get('owner_nft_address')
 
-    # If any required detail is missing, return a 400 bad request status
-    if not all([name, group, image, nft_address, game_characteristics]):
+    if not all([name, collection_address, image, nft_address, game_characteristics_json, handler, rank, owner_nft_address]):
         return jsonify({"message": "Missing required fields"}), 400
 
-    # Create the new fighter and add it to the database
     new_fighter = Fighter(
         name=name,
-        group=group,
+        collection_address=collection_address,
         image=image,
-        dna=dna,
         nft_address=nft_address,
-        game_characteristics=game_characteristics
+        game_characteristics_json=game_characteristics_json,
+        handler=handler,
+        rank=rank,
+        owner_nft_address=owner_nft_address
     )
     db.session.add(new_fighter)
     db.session.commit()
-
-    # Return a success message and the details of the new fighter
     return jsonify({"message": "Fighter created", "fighter": new_fighter.to_dict()}), 201
 
-@fighter_routes.route('/api/upload_fighter_image/<dna>', methods=['POST'])
-def upload_fighter_image(dna,baseUrl):
-    data = request.get_json()
-
-    # Get image data from the JSON payload
-    image_data = data.get('imageData')
-
-    # Remove 'data:image/png;base64,' from the start of the string
-    image_data = image_data.split(',')[1]
-
-    # Decode the base64 image data
-    decoded_image_data = base64.b64decode(image_data)
-
-    # Save the image
-    image_path = os.path.join('static', 'sprites',  f'{dna}.png')
-    with open(image_path, 'wb') as f:
-        f.write(decoded_image_data)
-    
-        
-    # Return a success message and the path of the image
-    return jsonify({'status': 'success', 'message': 'Image uploaded successfully', 'imagePath': image_path})
-
-@fighter_routes.route('/api/delete_fighter_characteristics/<dna>', methods=['POST'])
-def del_fighter_data(dna):
-    fighter = Fighter.query.filter_by(dna=dna).first()
-    
-    # If no fighter is found, return a 404 not found status
+@fighter_routes.route('/api/delete_fighter_characteristics/<nft_address>', methods=['POST'])
+def del_fighter_data(nft_address):
+    fighter = Fighter.query.filter_by(nft_address=nft_address).first()
     if fighter:
-        
-        # If the fighter is found, delete it from the database
         db.session.delete(fighter)
         db.session.commit()
-        # Return a success message
         return jsonify({"message": "Fighter characteristics deleted"}), 200
     else:
         return jsonify({"message": "No fighter found with this NFT address"}), 404
 
-@fighter_routes.route('/api/delete_fighter_image/<dna>', methods=['POST'])
-def del_fighter_image(dna):
-    fighter = Fighter.query.filter_by(dna=dna).first()
+@fighter_routes.route('/api/delete_fighter_image/<nft_address>', methods=['POST'])
+def del_fighter_image(nft_address):
+    fighter = Fighter.query.filter_by(nft_address=nft_address).first()
     if fighter:
-        # If the fighter is found, delete its image
-        image_path = os.path.join('static', 'sprites',  f'{dna}.png')
+        image_path = os.path.join('static', 'sprites', f'{nft_address}.png')
         if os.path.isfile(image_path):
             os.remove(image_path)
             return jsonify({'status': 'success', 'message': 'Image deleted successfully'}), 200
         else:
             return jsonify({"message": "No image found for this NFT address"}), 404
     else:
-        # If no fighter is found, return a 404 not found status
         return jsonify({"message": "No fighter found with this NFT address"}), 404
 
 @fighter_routes.route('/api/create_fighter', methods=['POST'])
 def create_fighter():
-    
     data = request.get_json()
     new_fighter = Fighter(
         name=data.get('name'),
-        collection=data.get('collection'),
+        collection_address=data.get('collection_address'),
         image=data.get('image'),
         rank=data.get('rank'),
         nft_address=data.get('nft_address'),
         game_characteristics_json=data.get('game_characteristics_json'),
         handler=data.get('handler')
     )
-
     db.session.add(new_fighter)
     db.session.commit()
-
     return jsonify(new_fighter.to_dict()), 201
 
+
+@fighter_routes.route('/api/create_fighter', methods=['POST'])
+def create_fighter():
+    data = request.get_json()
+    new_fighter = Fighter(
+        name=data.get('name'),
+        collection_address=data.get('collection_address'),
+        image=data.get('image'),
+        rank=data.get('rank'),
+        nft_address=data.get('nft_address'),
+        game_characteristics_json=data.get('game_characteristics_json'),
+        handler=data.get('handler'),
+        owner_nft_address=data.get('owner_nft_address')
+    )
+    db.session.add(new_fighter)
+    db.session.commit()
+    return jsonify(new_fighter.to_dict()), 201
+
+#c'est les game characterisitcs json qui vont changer les bails
 @fighter_routes.route('/update-fighter/<id>', methods=['PUT'])
 def update_fighter(id):
     fighter = Fighter.query.get(id)

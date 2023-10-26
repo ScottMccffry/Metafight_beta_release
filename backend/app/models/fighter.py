@@ -30,7 +30,7 @@ class Fighter(db.Model):
             'owner_nft_address': self.owner_nft_address,
             'rank': self.rank,
             'nft_address': self.nft_address,
-            'game_characteristics': self.game_characteristics_json,
+            'game_characteristics_json': self.game_characteristics_json,
             'handler': self.handler
         }
         if include_marketplace_item:
