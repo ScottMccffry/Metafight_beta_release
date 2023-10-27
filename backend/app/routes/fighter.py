@@ -114,23 +114,6 @@ def create_fighter():
     return jsonify(new_fighter.to_dict()), 201
 
 
-@fighter_routes.route('/api/create_fighter', methods=['POST'])
-def create_fighter():
-    data = request.get_json()
-    new_fighter = Fighter(
-        name=data.get('name'),
-        collection_address=data.get('collection_address'),
-        image=data.get('image'),
-        rank=data.get('rank'),
-        nft_address=data.get('nft_address'),
-        game_characteristics_json=data.get('game_characteristics_json'),
-        handler=data.get('handler'),
-        owner_nft_address=data.get('owner_nft_address')
-    )
-    db.session.add(new_fighter)
-    db.session.commit()
-    return jsonify(new_fighter.to_dict()), 201
-
 #c'est les game characterisitcs json qui vont changer les bails
 @fighter_routes.route('/update-fighter/<id>', methods=['PUT'])
 def update_fighter(id):
