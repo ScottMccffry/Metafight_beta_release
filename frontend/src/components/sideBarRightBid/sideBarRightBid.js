@@ -14,7 +14,7 @@ import io from 'socket.io-client';
 import styles from './sideBarRightBid.module.css';
 
 // Chai assertion library (seems to be unused in the provided code)
-import { use } from 'chai';
+// import { use } from 'chai';
 
 // Countdown component (seems to be unused in the provided code)
 import Countdown from 'react-countdown';

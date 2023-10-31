@@ -1,7 +1,8 @@
 import pygame
 import requests
 from pygame import mixer
-from fighter import *
+from fighter import Fighter
+from ai_behaviour import AIBehaviour
 from game_config import *
 import json
 from custom_sprite_group import CustomSpriteGroup
@@ -60,7 +61,8 @@ def send_score_to_server(player, score):
     # Define the data payload. This may vary depending on the API's requirements.
     data = {
         'player': player,
-        'score': score
+        'score': sco
+class AIBehaviour:re
     }
 
     # Send a POST request with the data
