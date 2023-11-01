@@ -63,6 +63,8 @@ function Header() {
   }
 
   const connectMetamaskClick = () => {
+    console.log('connecting wallet');
+
     connectWallet();
   }
 

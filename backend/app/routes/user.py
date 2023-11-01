@@ -8,10 +8,17 @@ user_routes = Blueprint('user_routes', __name__)
 
 
 #User Registration
-@user_routes.route('/register', methods=['POST'])
+@user_routes.route('/api/user/register', methods=['POST'])
 def register():
     data = request.get_json()
-    user = Users(email=data['email'], password=data['password'])
+    password_hash = generate_password_hash(data['password'], method='sha256')
+    user = Users(
+        username=data['username'], 
+        walletAddress=data['walletAddress'],
+        email=data['email'],
+        password_hash=password_hash,
+        image=data['image']
+    )
     db.session.add(user)
     db.session.commit()
     return {"message": "User registered successfully"}, 201
@@ -22,8 +29,9 @@ def logout():
     session.pop('user_id', None)
     return {"message": "Logout successful"}
 
+
 #User profile information fetch
-@user_routes.route('/api/user/profile/<wallet_address>', methods=['GET'])
+@user_routes.route('/api/user/<wallet_address>', methods=['GET'])
 def get_user_from_address(wallet_address):
     user = Users.query.filter_by(walletAddress=wallet_address).first()
     if user is None:

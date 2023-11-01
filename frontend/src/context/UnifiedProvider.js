@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ethers } from 'ethers';
 import UnifiedContext from './UnifiedContext';
+import ModalRegisterUsernamePassword from '../components/modalRegisterUsernamePassword/modalRegisterUsernamePassword';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -10,10 +11,12 @@ const UnifiedProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('user'));
   const [userId, setUserId] = useState('');
   const [userAddress, setUserAddress]= useState('')
+  const [username, setUsername]= useState('')
 
   // Wallet related states
-  const [isConnected, setIsConnected] = useState(false);
-  const [connectedUserId, setConnectedUserId] = useState('');
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+
 
   // Authentication related functions
   const loginUser = async (email, password) => {
@@ -42,69 +45,119 @@ const UnifiedProvider = ({ children }) => {
 
   // Wallet related functions
 
-    useEffect(() => {
-        const checkConnection = async () => {
-          if (typeof window.ethereum !== 'undefined') {
-            try {
-              let provider = new ethers.BrowserProvider(window.ethereum);
-              const signer = provider.getSigner();
-              const account = await signer.getAddress();
-              if (account) {
-                setIsConnected(true);
-                setConnectedUserId(account);
-              }
-            } catch (error) {
-              console.error("An error occurred while fetching the account: ", error);
-            }
-          }
-        };
-        
-        checkConnection();
-    
-        if (window.ethereum) {
-          window.ethereum.on('accountsChanged', (accounts) => {
-            if (accounts.length > 0) {
-              setIsConnected(true);
-              setConnectedUserId(accounts[0]);
-            } else {
-              setIsConnected(false);
-              setConnectedUserId('');
-            }
-          });
-        }
-    
-        return () => {
-          if (window.ethereum) {
-            window.ethereum.removeAllListeners('accountsChanged');
-          }
-        };
-    }, []);
-  
-
-  const connectWallet = async () => {
-    if (window.ethereum) {
+  useEffect(() => {
+    const checkConnection = async () => {
+      if (typeof window.ethereum !== 'undefined') {
         try {
-          if (!window.ethereum.selectedAddress) {
-            await window.ethereum.request({ method: 'eth_requestAccounts' });
-          }
-          let provider = new ethers.BrowserProvider(window.ethereum)
+          const provider = new ethers.BrowserProvider(window.ethereum);
           const signer = provider.getSigner();
           const account = await signer.getAddress();
-          setIsConnected(true);
-          setConnectedUserId(account);
+          if (account) {
+            setIsWalletConnected(true);
+            setUserAddress(account);
+          }
+        } catch (error) {
+          console.error("An error occurred while fetching the account: ", error);
+        }
+      }
+    };
+    
+    checkConnection();
+  
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length > 0) {
+          setIsWalletConnected(true);
+          setUserAddress(accounts[0]);
+        } else {
+          setIsWalletConnected(false);
+          setUserAddress('');
+        }
+      });
+    }
+  
+    return () => {
+      if (window.ethereum) {
+        window.ethereum.removeAllListeners('accountsChanged');
+      }
+    };
+  }, []);
+
+  const handleRegistration = async (formData) => {
+    try {
+      // You need to implement the API call to register the user here
+      // and handle the response accordingly
+      const response = await axios.post(`${API_BASE_URL}/api/user/register`, {
+      username: formData.username,
+      password: formData.password,
+      walletAddress: userAddress,
+      email: formData.email,
+      image: formData.image,
+      });
+      setUsername(formData.username)
+      console.log("Registration successful:", response.data);
+      setShowRegistrationModal(false);
+    } catch (error) {
+      console.error('Error during registration:', error.message);
+    }
+  };
+
+  const checkUserExists = async (walletAddress) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/user/${walletAddress}`);
+      // If the user exists, you can set the authentication state here
+      console.log("User found:", response.data);
+      setIsAuthenticated(true);
+      setUserId(response.data.userId);
+      setUsername(response.data.username)
+      setUserAddress(response.data.walletAddress);
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        // If the user does not exist, show the registration popup
+        setShowRegistrationModal(true);
+      } else {
+        console.error('Error checking user existence:', error.message);
+      }
+    }
+  };
+ 
+  const connectWallet = async () => {
+    console.log('connecting wallet2');
+        try {
+          let provider = new ethers.BrowserProvider(window.ethereum)
+          const accounts = await provider.listAccounts();
+
+          if (accounts.length === 0) {
+            console.log('connecting wallet3');
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+          }
+          console.log('connecting wallet4');
+          const signer = await provider.getSigner();
+          const account = await signer.getAddress();
+          setIsWalletConnected(true);
+          setUserAddress(account);
+          
+
+          await checkUserExists(account);
+          console.log('connecting wallet5');
+
         } catch (error) {
           console.error('Error connecting wallet:', error);
         }
-      } else {
-        alert('Please install MetaMask or another Ethereum wallet provider.');
-      }
-  };
+   
+}
 
   return (
-    <UnifiedContext.Provider value={{ isAuthenticated, userId,userAddress, loginUser, logoutUser, isConnected, connectedUserId, connectWallet }}>
+    <UnifiedContext.Provider value={{ isAuthenticated, userId,userAddress, isWalletConnected, loginUser, logoutUser, connectWallet }}>
       {children}
+      {showRegistrationModal && (
+        <ModalRegisterUsernamePassword
+          onClose={() => setShowRegistrationModal(false)}
+          onSubmit={handleRegistration}
+        />
+      )}
     </UnifiedContext.Provider>
   );
-};
+}; 
 
 export default UnifiedProvider;

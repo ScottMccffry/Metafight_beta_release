@@ -9,8 +9,7 @@ const UnifiedContext = createContext({
   logoutUser: () => {},
 
   // Wallet related states and functions
-  isConnected: false,
-  connectedUserId: '',
+  isWalletConnected: false,
   userAddress:'',
   connectWallet: () => {},
   // Add any other wallet-related functions here

@@ -15,7 +15,7 @@ function findAndCopyLine(directoryPath, searchText) {
         const lines = fs.readFileSync(filePath, 'utf-8').split('\n');
         for (let i = 1; i < lines.length; i++) {
           if (lines[i].includes(searchText)) {
-            copiedLines.push(filePath.trim());
+            copiedLines.push(file.trim());
             copiedLines.push(lines[i ].trim());
           }
         }
