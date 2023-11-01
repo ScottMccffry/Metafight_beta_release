@@ -20,4 +20,4 @@ if __name__ == '__main__':
     # Start the event listener in a separate process
     #Process(target=eventListener.main).start()
     #before it was app.run(debug=True)
-    socketio.run(app, host='0.0.0.0', port=80, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
