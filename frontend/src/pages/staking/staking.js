@@ -4,7 +4,7 @@ import CardStack from '../../components/cardStack/cardStack';
 import StackingOptions from '../../components/stakingOptions/stakingOptions';
 import ContentStaking from '../../components/contents/contentStaking/contentStaking';
 
-const API_BASE_URL = 'http://127.0.0.1:5000';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const Stacking = () => {
     const { 
