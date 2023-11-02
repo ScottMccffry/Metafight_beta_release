@@ -15,14 +15,13 @@ def register():
     user = Users(
         username=data['username'], 
         walletAddress=data['walletAddress'],
-        email=data['email'],
+        email=data.get('email'),  # Use .get() to return None if the key is not in the dictionary
         password_hash=password_hash,
-        image=data['image']
+        image=data.get('image')  # Use .get() to return None if the key is not in the dictionary
     )
     db.session.add(user)
     db.session.commit()
     return {"message": "User registered successfully"}, 201
-
 #User Logout
 @user_routes.route('/api/user/logout', methods=['POST'])
 def logout():

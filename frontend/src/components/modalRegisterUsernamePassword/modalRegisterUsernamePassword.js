@@ -22,14 +22,14 @@ const ModalRegisterUsernamePassword = ({ onClose, onSubmit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/user/register', formData);
+      const response = await axios.post(`${API_BASE_URL}/api/user/register`, formData);
       console.log('User registered successfully:', response.data);
       if(onSubmit) await onSubmit(formData);
     } catch (error) {
       console.error('Error registering user:', error.response ? error.response.data : error.message);
     }
   };
-  };
+
 
   return (
     <div
