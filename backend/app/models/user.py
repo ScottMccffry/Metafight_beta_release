@@ -9,7 +9,7 @@ class Users(db.Model):
     email = db.Column(db.String(50), nullable=True)  # Optional
     password_hash = db.Column(db.String(100), nullable=False)
     image = db.Column(db.String(255), nullable=True)  # Optional
-    funds = db.Column(db.Float, nullable=False)
+    funds = db.Column(db.Float, nullable=True, default=0)
     fighters = db.relationship('Fighter', backref='user', lazy=True)  # New relationship
 
     def to_dict(self):
