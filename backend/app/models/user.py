@@ -4,11 +4,11 @@ from datetime import datetime
 
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(255), nullable=False)
-    walletAddress = db.Column(db.String(255), nullable=False)
-    email = db.Column(db.String(64), unique=True, index=True)
-    password_hash = db.Column(db.String(128))
-    image = db.Column(db.String(255), nullable=False)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    walletAddress = db.Column(db.String(50), unique=True, nullable=False)
+    email = db.Column(db.String(50), nullable=True)  # Optional
+    password_hash = db.Column(db.String(100), nullable=False)
+    image = db.Column(db.String(255), nullable=True)  # Optional
     funds = db.Column(db.Float, nullable=False)
     fighters = db.relationship('Fighter', backref='user', lazy=True)  # New relationship
 

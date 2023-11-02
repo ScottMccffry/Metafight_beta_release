@@ -2,15 +2,16 @@ import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import UnifiedContext from '../../context/UnifiedContext';
 
-const ModalRegisterUsernamePassword = ({ onClose, onSubmit, userAddress }) => {
-  const { connectWallet } = useContext(UnifiedContext);
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
+
+const ModalRegisterUsernamePassword = ({ onClose, onSubmit }) => {
+  const { userAddress } = useContext(UnifiedContext);
   
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     walletAddress: userAddress,
     email: '',
-    image: '',
   });
 
   const handleChange = (e) => {
@@ -20,7 +21,14 @@ const ModalRegisterUsernamePassword = ({ onClose, onSubmit, userAddress }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await onSubmit(formData);
+    try {
+      const response = await axios.post('/api/user/register', formData);
+      console.log('User registered successfully:', response.data);
+      if(onSubmit) await onSubmit(formData);
+    } catch (error) {
+      console.error('Error registering user:', error.response ? error.response.data : error.message);
+    }
+  };
   };
 
   return (
@@ -32,10 +40,10 @@ const ModalRegisterUsernamePassword = ({ onClose, onSubmit, userAddress }) => {
         className="bg-zinc-900 p-6 rounded-md w-full max-w-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-semibold mb-4">Register</h2>
+        <h2 className="text-xl font-semibold mb-4 text-white">Register</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="username" className="block mb-2 text-white">Username</label>
+            <label htmlFor="username" className="block mb-2 text-white">Username *</label>
             <input
               type="text"
               id="username"
@@ -47,12 +55,11 @@ const ModalRegisterUsernamePassword = ({ onClose, onSubmit, userAddress }) => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="password" className="block mb-2 text-white">Password</label>
+            <label htmlFor="password" className="block mb-2 text-white">Password *</label>
             <input
               type="password"
               id="password"
               name="password"
-              placeholder={userAddress}
               className="w-full p-2 border border-gray-300 rounded-md"
               value={formData.password}
               onChange={handleChange}
@@ -64,7 +71,7 @@ const ModalRegisterUsernamePassword = ({ onClose, onSubmit, userAddress }) => {
             <input
               type="text"
               id="walletAddress"
-              name="wallet "
+              name="walletAddress"
               className="w-full p-2 border border-gray-300 rounded-md"
               value={formData.walletAddress}
               onChange={handleChange}
@@ -72,6 +79,7 @@ const ModalRegisterUsernamePassword = ({ onClose, onSubmit, userAddress }) => {
               readOnly
             />
           </div>
+      
           <div className="mb-4">
             <label htmlFor="email" className="block mb-2 text-white">Email</label>
             <input
@@ -81,20 +89,9 @@ const ModalRegisterUsernamePassword = ({ onClose, onSubmit, userAddress }) => {
               className="w-full p-2 border border-gray-300 rounded-md"
               value={formData.email}
               onChange={handleChange}
-              
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="image" className="block mb-2 text-white">Image URL</label>
-            <input
-              type="text"
-              id="image"
-              name="image"
-              className="w-full p-2 border border-gray-300 rounded-md"
-              value={formData.image}
-              onChange={handleChange}
-            />
-          </div>
+          <h3 className="mb-2 text-white text-md">*Mandatory fields</h3>
           <button
             type="submit"
             className="py-2 bg-gradient-to-tr from-fuchsia-600 to-violet-600 rounded-md w-full"
