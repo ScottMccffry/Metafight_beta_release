@@ -15,9 +15,9 @@ def register():
     user = Users(
         username=data['username'], 
         walletAddress=data['walletAddress'],
-        email=data.get('email'),  # Use .get() to return None if the key is not in the dictionary
+        email=data.get('email', '') ,  # Use .get() to return None if the key is not in the dictionary
         password_hash=password_hash,
-        image=data.get('image')  # Use .get() to return None if the key is not in the dictionary
+        image=data.get('image', '')   # Use .get() to return None if the key is not in the dictionary
     )
     db.session.add(user)
     db.session.commit()
