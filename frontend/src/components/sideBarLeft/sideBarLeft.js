@@ -31,10 +31,9 @@ function SidebarLeft() {
   // Handling the logout process
   const handleLogout = async () => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/user/logout`);
-      if(response.data.message === 'Logout successful') {
-        logoutUser(); // Logout function from AuthContext
-      }
+     
+        logoutUser(); // Logout function from UnifiedContext
+      
     } catch (error) {
       console.error("Logout error: ", error);
     }

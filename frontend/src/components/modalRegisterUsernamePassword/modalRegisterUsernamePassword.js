@@ -5,7 +5,16 @@ import UnifiedContext from '../../context/UnifiedContext';
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 
 const ModalRegisterUsernamePassword = ({ onClose, onSubmit }) => {
-  const { userAddress } = useContext(UnifiedContext);
+  const {
+    loginUser,
+    logoutUser,
+    isAuthenticated,
+    userId,
+    userAddress,
+    isWalletConnected,
+    handleRegistration,
+
+  } = useContext(UnifiedContext);
   
   const [formData, setFormData] = useState({
     username: '',
@@ -18,18 +27,18 @@ const ModalRegisterUsernamePassword = ({ onClose, onSubmit }) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+   // Call this function when the user submits the registration form
+  const onRegistrationSubmit = async (formData) => {
+    formData.preventDefault()
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/user/register`, formData);
-      console.log('User registered successfully:', response.data);
-      if(onSubmit) await onSubmit(formData);
+      console.log('register')
+      await handleRegistration(formData);
+      // handle additional logic after successful registration if needed
     } catch (error) {
-      console.error('Error registering user:', error.response ? error.response.data : error.message);
+      // Handle registration error
+      console.error('Registration Error:', error);
     }
   };
-
 
   return (
     <div
@@ -38,10 +47,10 @@ const ModalRegisterUsernamePassword = ({ onClose, onSubmit }) => {
     >
       <div
         className="bg-zinc-900 p-6 rounded-md w-full max-w-lg"
-        onClick={(e) => e.stopPropagation()}
+        onClick={(formData) => formData.stopPropagation()}
       >
         <h2 className="text-xl font-semibold mb-4 text-white">Register</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={onRegistrationSubmit}>
           <div className="mb-4">
             <label htmlFor="username" className="block mb-2 text-white">Username *</label>
             <input

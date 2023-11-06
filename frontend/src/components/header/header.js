@@ -10,7 +10,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 // `Header` component definition
 function Header() {
   // Context hooks to get wallet and authentication states and functions
-  const { isConnected, connectWallet, isAuthenticated, userId, loginUser } = useContext(UnifiedContext);
+  const { isConnected,userAddress, connectWallet, isAuthenticated, userId, loginUser } = useContext(UnifiedContext);
 
   
   // State hooks for user data, various popups, login details, errors, and dropdowns
@@ -28,24 +28,25 @@ function Header() {
   const navigate = useNavigate();
 
   // Callback hook to fetch user data
-  const fetchUserData = useCallback(async (userIdFromLogin) => {
-    const idToUse = userIdFromLogin || userId;
-    if (idToUse) {
+  const fetchUserData = useCallback(async (userAddressFromLogin) => {
+    const addressToSearch= userAddressFromLogin || userAddress;
+    if (addressToSearch) {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/user/${idToUse}`);
+        const response = await axios.get(`${API_BASE_URL}/api/user/${addressToSearch}`);
         setUserData(response.data);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
     } else {
+    
       setUserData(null);
     }
-  }, [userId]);
+  }, [userAddress]);
 
   // Effect hook to fetch user data whenever the `userId` changes
   useEffect(() => {
     fetchUserData();
-  }, [userId]);
+  }, [userAddress]);
 
   // Handler functions for various input changes and button clicks
   const handleEmailChange = (event) => {
@@ -105,9 +106,9 @@ function Header() {
     try {
       console.log('debug1')
 
-      const userIdFromLogin = await loginUser(email, password);
-      if (userIdFromLogin) {
-        await fetchUserData(userIdFromLogin); // Use the `userId` from the login to fetch user data
+      const userAddressFromLogin = await loginUser(email, password);
+      if (userAddressFromLogin) {
+        await fetchUserData(userAddressFromLogin); // Use the `userId` from the login to fetch user data
         setShowConnectPopup(false);
       }
     } catch (error) {

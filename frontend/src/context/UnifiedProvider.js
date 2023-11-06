@@ -30,19 +30,22 @@ const UnifiedProvider = ({ children }) => {
       setIsAuthenticated(true);
       setUserId(response.data.userId);
       setUserAddress(response.data.userAddress)
-      return response.data.userId;
+      return response.data.userAddress;
     } catch (error) {
       console.error('Error during login:', error.message);
       throw new Error('Failed to login. Please check your credentials.');
     }
   };
 
-  const logoutUser = () => {
-    axios.post(`${API_BASE_URL}/api/users/logout`);
+  const logoutUser = async () => {
+    const response = await axios.post(`${API_BASE_URL}/api/user/logout`);
+    if(response.data.message === 'Logout successful') {
     setIsAuthenticated(false);
+    setIsWalletConnected(false);
     setUserId('');
+    setUserAddress('');
   };
-
+}
   // Wallet related functions
 
   useEffect(() => {
@@ -123,8 +126,10 @@ const UnifiedProvider = ({ children }) => {
  
   const connectWallet = async () => {
     console.log('connecting wallet2');
-        try {
-          let provider = new ethers.BrowserProvider(window.ethereum)
+    if(typeof window != "undefined" && typeof window.ethereum != "undefined"){
+      try {
+          console.log('yes')
+          const provider =  new ethers.BrowserProvider(window.ethereum)
           const accounts = await provider.listAccounts();
 
           if (accounts.length === 0) {
@@ -145,7 +150,7 @@ const UnifiedProvider = ({ children }) => {
           console.error('Error connecting wallet:', error);
         }
    
-}
+}}
 
   return (
     <UnifiedContext.Provider value={{ isAuthenticated, userId,userAddress, isWalletConnected, loginUser, logoutUser, connectWallet }}>

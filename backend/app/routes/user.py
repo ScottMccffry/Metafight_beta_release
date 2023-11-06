@@ -40,7 +40,7 @@ def get_user_from_address(wallet_address):
         return jsonify(user.to_dict())
 
 #specific user data through id
-@user_routes.route('/api/user/<userId>', methods=['GET'])
+@user_routes.route('/api/user/id/<userId>', methods=['GET'])
 def get_user_from_ID(userId):
     print(f"userId: {userId}")
     user = Users.query.filter_by(id=userId).first()
