@@ -6,8 +6,8 @@ async function main() {
   console.log("Deploying MetaFight contract with the account:", deployer.address);
 
   const MetaFight = await hre.ethers.getContractFactory("MetaFight");
-  const metafight = await MetaFight.deploy("MetaFightToken", "MFT", "https://example.com/token/");
-
+  const metafight = await MetaFight.deploy("MetaFightToken", "MFT", "ipfs://QmcXnQK9GKqXE9X8kkGe7Sb5G9rBAAPw6oxeA4CrjdQmCu/");
+  console.log('Deploying Contract')
   await metafight.deployed();
 
   console.log("MetaFight contract deployed to:", metafight.address);
