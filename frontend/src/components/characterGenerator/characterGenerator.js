@@ -1,253 +1,124 @@
-import React, { useState } from 'react';
-//import MFT from '../../artifacts/contracts/MetaFight.sol/MetaFight.json'
+import React, { useState, useReducer, useContext } from 'react';
+//import MFT from '../../../../blockchain/artifacts/contracts/MetaFight.sol/MetaFight.json'
 import { ethers } from 'ethers';
 import { create } from 'ipfs-http-client';
+import BlockchainContext from '../../context/BlockchainContext';
+//@TO DO Put real INFURA link
+const ipfsClient = create('https://ipfs.infura.io:5001/api/v0');
+
+const Options = {
+  bodyOptions: ['Body type', 'Shadow', 'Body color', 'Special', 'Wounds', 'Prostheses', 'Lizard'],
+  headOptions: ['Heads', 'Ears', 'Nose', 'Eyes', 'Wrinkles', 'Beards', 'Hair', 'Appendages', 'Head coverings', 'Hats and Helmets', 'Accessories', 'Neck'],
+  armsOptions: ['Shoulders', 'Armour', 'Bauldron', 'Wrists', 'Gloves'],
+  torsoOptions: ['Shirts', 'Aprons', 'Bandages', 'Chainmail', 'Jacket', 'Vest', 'Armour', 'Cape', 'Waist'],
+  legsOptions: ['Legs', 'Boots', 'Shoes'],
+  toolsOptions: ['Rod', 'Smash', 'Thrust', 'Whip'],
+  weaponsOptions: ['Shield', 'Quiver', 'Ranged', 'Sword', 'Blunt', 'Polearm', 'Magic', 'Misc', 'Preview', 'Walk']
+};
+
+// Define the initial state for the reducer
+const initialState = {
+  nftName: '',
+  characteristics: {},
+  accordionStates: {
+    isBodyOpen: false,
+    isHeadOpen: false,
+    isArmsOpen: false,
+    isTorsoOpen: false,
+    isLegsOpen: false,
+    isToolsOpen: false,
+    isWeaponsOpen: false,
+  },
+  selectedTypes: {
+    bodyType: '',
+    headType: '',
+    armsType: '',
+    torsoType: '',
+    legsType: '',
+    toolsType: '',
+    weaponsType: '',
+  },
+  price: 0,
+  error: null,
+};
+
+// Reducer function to manage the state
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_FIELD':
+      return {
+        ...state,
+        [action.field]: action.value,
+      };
+    case 'TOGGLE_ACCORDION':
+      return {
+        ...state,
+        accordionStates: {
+          ...state.accordionStates,
+          [action.section]: !state.accordionStates[action.section],
+        },
+      };
+    case 'SET_CHARACTERISTIC':
+      return {
+        ...state,
+        selectedTypes: {
+          ...state.selectedTypes,
+          [action.characteristic]: action.value,
+        },
+        characteristics: {
+          ...state.characteristics,
+          [action.characteristic]: action.value,
+        },
+      };
+    case 'UPDATE_PRICE':
+      // Recalculate the price based on selectedTypes
+      const newPrice = Object.values(state.selectedTypes).reduce(
+        (acc, type) => acc + (type !== 'defaultValue' ? 1 : 0),
+        0.05
+      );
+      return {
+        ...state,
+        price: newPrice,
+      };
+    case 'SET_ERROR':
+      return {
+        ...state,
+        error: action.error,
+      };
+    default:
+      return state;
+  }
+};
+
+
+
 
 
 const CharacterGenerator = () => {
-  //type of characteristics
-  const [nftName, setNftName] = useState('');
-  const [fighter, setFighter] = useState('');
-  const [weapon, setWeapon] = useState('');
-  const [color, setColor] = useState('');
-  const [error, setError] = useState(null);
-  const MFTaddress ='0x5FbDB2315678afecb367f032d93F642f64180aa3' 
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { mintNFT } = useContext(BlockchainContext);
 
-  //json format for database characteristics
-  const [characteristics, setCharacteristics] = useState({});
-  // State variables to manage accordion sections
-  const [isBodyOpen, setBodyOpen] = useState(false);
-  const [isHeadOpen, setHeadOpen] = useState(false);
-  const [isArmsOpen, setArmsOpen] = useState(false);
-  const [isTorsoOpen, setTorsoOpen] = useState(false);
-  const [isLegsOpen, setLegsOpen] = useState(false);
-  const [isToolsOpen, setToolsOpen] = useState(false);
-  const [isWeaponsOpen, setWeaponsOpen] = useState(false);
 
-  const handleBodyAccordionToggle = () => setBodyOpen(!isBodyOpen);
-  const handleHeadAccordionToggle = () => setHeadOpen(!isHeadOpen);
-  const handleArmsAccordionToggle = () => setArmsOpen(!isArmsOpen);
-  const handleTorsoAccordionToggle = () => setTorsoOpen(!isTorsoOpen);
-  const handleLegsAccordionToggle = () => setLegsOpen(!isLegsOpen);
-  const handleToolsAccordionToggle = () => setToolsOpen(!isToolsOpen);
-  const handleWeaponsAccordionToggle = () => setWeaponsOpen(!isWeaponsOpen);
-  const [bodyType, setBodyType] = useState('defaultValue');
-  const handleBodyTypeChange = (event) => {
-    setBodyType(event.target.value);
-    setCharacteristics((prevCharacteristics) => ({
-      ...prevCharacteristics,
-      bodyType: event.target.value,
-    }));
-    updatePrice();
+  const handleAccordionToggle = (section) => {
+    dispatch({ type: 'TOGGLE_ACCORDION', section });
   };
 
-  const [headType, setHeadType] = useState('defaultValue');
-  const handleHeadTypeChange = (event) => {
-    setHeadType(event.target.value);
-    setCharacteristics((prevCharacteristics) => ({
-      ...prevCharacteristics,
-      headType: event.target.value,
-    }));
-    updatePrice();
+  const handleTypeChange = (event) => {
+    const { name, value } = event.target;
+    dispatch({ type: 'SET_CHARACTERISTIC', characteristic: name, value });
+    dispatch({ type: 'UPDATE_PRICE' }); // This will trigger the price update
   };
 
-  const [armsType, setArmsType] = useState('defaultValue');
-  const handleArmsTypeChange = (event) => {
-    setArmsType(event.target.value);
-    setCharacteristics((prevCharacteristics) => ({
-      ...prevCharacteristics,
-      armsType: event.target.value,
-    }));
-    updatePrice();
-  };
-
-  const [torsoType, setTorsoType] = useState('defaultValue');
-  const handleTorsoTypeChange = (event) => {
-    setTorsoType(event.target.value);
-    setCharacteristics((prevCharacteristics) => ({
-      ...prevCharacteristics,
-      torsoType: event.target.value,
-    }));
-    updatePrice();
-  };
-
-  const [legsType, setLegsType] = useState('defaultValue');
-  const handleLegsTypeChange = (event) => {
-    setLegsType(event.target.value);
-    setCharacteristics((prevCharacteristics) => ({
-      ...prevCharacteristics,
-      legsType: event.target.value,
-    }));
-    updatePrice();
-  };
-
-  const [toolsType, setToolsType] = useState('defaultValue');
-  const handleToolsTypeChange = (event) => {
-    setToolsType(event.target.value);
-    setCharacteristics((prevCharacteristics) => ({
-      ...prevCharacteristics,
-      toolsType: event.target.value,
-    }));
-    updatePrice();
-  };
-
-  const [weaponsType, setWeaponsType] = useState('defaultValue');
-  const handleWeaponsTypeChange = (event) => {
-    setWeaponsType(event.target.value);
-    setCharacteristics((prevCharacteristics) => ({
-      ...prevCharacteristics,
-      weaponsType: event.target.value,
-    }));
-    updatePrice();
-  };
-
-
-  // Event handlers...
-  const [price, setPrice] = useState(0);
-  const ipfs = create({
-    host: 'ipfs.infura.io',
-    port: '5001',
-    protocol: 'https',
-  });
-
-  const handleNftNameChange = (event) => {
-    setNftName(event.target.value);
-  };
-
-  const updatePrice = () => {
-    const basePrice = 0.05;
-    const fighterPrice = fighter !== 'defaultValue' ? 1 : 0;
-    const weaponPrice = weaponsType !== 'defaultValue' ? 1 : 0;
-    const bodyTypePrice = bodyType !== 'defaultValue' ? 1 : 0;
-    const headTypePrice = headType !== 'defaultValue' ? 1 : 0;
-    const armsTypePrice = armsType !== 'defaultValue' ? 1 : 0;
-    const torsoTypePrice = torsoType !== 'defaultValue' ? 1 : 0;
-    const legsTypePrice = legsType !== 'defaultValue' ? 1 : 0;
-    const toolsTypePrice = toolsType !== 'defaultValue' ? 1 : 0;
-    
-    setPrice(
-      basePrice +
-      fighterPrice +
-      weaponPrice +
-      bodyTypePrice +
-      headTypePrice +
-      armsTypePrice +
-      torsoTypePrice +
-      legsTypePrice +
-      toolsTypePrice
-    );
-  };
-  
-const sendCharacteristicsToServer = async () => {
-  try {
-    const response = await fetch('/api/create-fighter', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(characteristics),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to send the characteristics to the server');
-    }
-
-    const result = await response.json();
-    console.log('Characteristics sent successfully:', result);
-  } catch (error) {
-    console.error('Error:', error);
-  }
-};
-
-const createCombinedImage = async () => {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = 400; // Set the canvas width and height based on your image size
-  canvas.height = 400;
-
-  const loadImage = (src) => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.src = src;
-    });
-  };
-
-  if (fighter) {
-    const fighterImg = await loadImage(`../../assets/character/${fighter}.png`);
-    ctx.drawImage(fighterImg, 0, 0);
-  }
-  
-  if (weapon) {
-    const weaponImg = await loadImage(`../../assets/weapon/${weapon}.png`);
-    ctx.drawImage(weaponImg, 0, 0);
-  }
-
-  const combinedImageUrl = canvas.toDataURL('image/png');
-  return combinedImageUrl;
-};
-{/*
-const mintNFT = async () => {
-  if(typeof window.ethereum !== 'undefined') {
-    let accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
-    const provider = new ethers.providers(window.ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(MFTaddress, MFT.abi, signer);
-    try {
-      const combinedImageUrl = await createCombinedImage();
-
-      //const ipfsHash = await saveImageToIPFS(combinedImageUrl);
-      //const imageIPFSUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
-      //console.log(`Minting NFT with fighter: ${fighter}, weapon: ${weapon}, name: ${nftName}, price: ${price}, image: ${imageIPFSUrl}`);
-      
-      // Create NFT metadata
-      const metadata = {
-        name: nftName,
-        description: `A unique character with ${fighter} and ${weapon}`,
-        //image: imageIPFSUrl,
-      };
-      
-      //Save metadata to IPFS
-      //const metadataIPFSHash = await saveMetadataToIPFS(metadata);
-
-      let overrides = {
-        
-        from: accounts[0],
-        //value: data.cost
-      }
-      const transaction = await contract.mint(accounts[0], 1, overrides);
-      await transaction.wait();
-      //console.log(`Successfully minted NFT name: ${nftName}, price: ${price}, image: ${imageIPFSUrl}`)
-      sendCharacteristicsToServer();
-    }
-    catch(err) {
-      setError(err.message);
-    }
-  }
-
-
-
- 
-  
-  // Interact with your smart contract to mint the NFT and include the metadata
-  // Add your smart contract interaction code 
-};
-*/}
-  // Function to toggle the open/close status of the Fighter accordion
-  
-
-  // JSX content for the Fighter accordion section
-  
-  const bodyAccordionContent = (
-    <div id="accordion-nested-collapse-body-body" data-accordion="collapse">
-      {['Body type', 'Shadow', 'Body color', 'Special', 'Wounds', 'Prostheses', 'Lizard'].map((option) => (
+  const generateAccordionContent = (type, options) => (
+    <div id={`accordion-nested-collapse-body-${type}`} data-accordion="collapse">
+      {options.map((option) => (
         <label className="block mb-2" key={option}>
           <input
             type="radio"
-            name="bodyType"
+            name={`${type}Type`}
             value={option}
-            checked={bodyType === option}
-            onChange={handleBodyTypeChange}
+            checked={state.selectedTypes[`${type}Type`] === option}
+            onChange={(e) => handleTypeChange(e, `${type}Type`)}
           />
           <span className="ml-2">{option}</span>
         </label>
@@ -255,118 +126,16 @@ const mintNFT = async () => {
     </div>
   );
 
-  const headAccordionContent = (
-    <div id="accordion-nested-collapse-body-head" data-accordion="collapse">
-      {[
-        'Heads', 'Ears', 'Nose', 'Eyes', 'Wrinkles', 'Beards', 'Hair', 'Appendages',
-        'Head coverings', 'Hats and Helmets', 'Accessories', 'Neck'
-      ].map((option) => (
-        <label className="block mb-2" key={option}>
-          <input
-            type="radio"
-            name="headType"
-            value={option}
-            checked={headType === option}
-            onChange={handleHeadTypeChange}
-          />
-          <span className="ml-2">{option}</span>
-        </label>
-      ))}
-    </div>
-  );
+  const accordionItems = [
+    { type: 'body',  label: 'Body', isOpen: state.accordionStates.isBodyOpen, toggle: () => handleAccordionToggle('isBodyOpen') },
+    { type: 'head', label: 'Head', isOpen: state.accordionStates.isHeadOpen, toggle: () => handleAccordionToggle('isHeadOpen') },
+    { type: 'arms', label: 'Arms', isOpen: state.accordionStates.isArmsOpen, toggle: () => handleAccordionToggle('isArmsOpen') },
+    { type: 'torso', label: 'Torso', isOpen: state.accordionStates.isTorsoOpen, toggle: () => handleAccordionToggle('isTorsoOpen') },
+    { type: 'legs', label: 'Legs', isOpen: state.accordionStates.isLegsOpen, toggle: () => handleAccordionToggle('isLegsOpen') },
+    { type: 'tools', label: 'Tools', isOpen: state.accordionStates.isToolsOpen, toggle: () => handleAccordionToggle('isToolsOpen') },
+    { type: 'weapons', label: 'Weapons', isOpen: state.accordionStates.isWeaponsOpen, toggle: () => handleAccordionToggle('isWeaponsOpen') },
+  ];
 
-  const armsAccordionContent = (
-    <div id="accordion-nested-collapse-body-arms" data-accordion="collapse">
-      {['Shoulders', 'Armour', 'Bauldron', 'Wrists', 'Gloves'].map((option) => (
-        <label className="block mb-2" key={option}>
-          <input
-            type="radio"
-            name="armsType"
-            value={option}
-            checked={armsType === option}
-            onChange={handleArmsTypeChange}
-          />
-          <span className="ml-2">{option}</span>
-        </label>
-      ))}
-    </div>
-  );
-
-  const torsoAccordionContent = (
-    <div id="accordion-nested-collapse-body-torso" data-accordion="collapse">
-      {[
-        'Shirts', 'Aprons', 'Bandages', 'Chainmail', 'Jacket', 'Vest', 'Armour',
-        'Cape', 'Waist'
-      ].map((option) => (
-        <label className="block mb-2" key={option}>
-          <input
-            type="radio"
-            name="torsoType"
-            value={option}
-            checked={torsoType === option}
-            onChange={handleTorsoTypeChange}
-          />
-          <span className="ml-2">{option}</span>
-        </label>
-      ))}
-    </div>
-  );
-
-  const legsAccordionContent = (
-    <div id="accordion-nested-collapse-body-legs" data-accordion="collapse">
-      {['Legs', 'Boots', 'Shoes'].map((option) => (
-        <label className="block mb-2" key={option}>
-          <input
-            type="radio"
-            name="legsType"
-            value={option}
-            checked={legsType === option}
-            onChange={handleLegsTypeChange}
-          />
-          <span className="ml-2">{option}</span>
-        </label>
-      ))}
-    </div>
-  );
-
-  const toolsAccordionContent = (
-    <div id="accordion-nested-collapse-body-tools" data-accordion="collapse">
-      {['Rod', 'Smash', 'Thrust', 'Whip'].map((option) => (
-        <label className="block mb-2" key={option}>
-          <input
-            type="radio"
-            name="toolsType"
-            value={option}
-            checked={toolsType === option}
-            onChange={handleToolsTypeChange}
-          />
-          <span className="ml-2">{option}</span>
-        </label>
-      ))}
-    </div>
-  );
-
-  const weaponsAccordionContent = (
-    <div id="accordion-nested-collapse-body-weapons" data-accordion="collapse">
-      {[
-        'Shield', 'Quiver', 'Ranged', 'Sword', 'Blunt', 'Polearm',
-        'Magic', 'Misc', 'Preview', 'Walk'
-      ].map((option) => (
-        <label className="block mb-2" key={option}>
-          <input
-            type="radio"
-            name="weaponsType"
-            value={option}
-            checked={weaponsType === option}
-            onChange={handleWeaponsTypeChange}
-          />
-          <span className="ml-2">{option}</span>
-        </label>
-      ))}
-    </div>
-  );
- 
-  
   function AccordionIcon({ isOpen }) {
     return (
       <svg
@@ -386,6 +155,136 @@ const mintNFT = async () => {
       </svg>
     );
   } 
+
+  const renderAccordionItem = ({ type, label, isOpen, toggle }) => {
+    const typeOptions = `${type}Options`
+    const accordionContent = generateAccordionContent(type, Options[`${type}Options`] || []);
+    return (
+      <h2 key={type}>
+        <button
+          type="button"
+          className={`flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-gray-200 rounded-xl ml-0 m-2 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 ${isOpen ? 'bg-gray-100 dark:bg-gray-800' : ''}`}
+          onClick={toggle}
+          aria-expanded={isOpen}
+        >
+          <span>{label}</span>
+          <AccordionIcon isOpen={isOpen} />
+        </button>
+        {isOpen && accordionContent}
+      </h2>
+    );
+  };
+
+  const createCombinedImage = async () => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 400; // Set the canvas width and height based on your image size
+    canvas.height = 400;
+  
+    const loadImage = (src) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    };
+  
+    // Helper function to draw the image if the option is not ''
+    const drawOption = async (optionType, optionValue, folder) => {
+      if (optionValue && optionValue !== '') {
+        const img = await loadImage(`/static/images/${folder}/${optionValue}.png`);
+        ctx.drawImage(img, 0, 0);
+      }
+    };
+  
+    // You will need to adjust these paths to match where your images are stored
+    await drawOption('bodyType', state.selectedTypes.bodyType, 'body');
+    await drawOption('headType', state.selectedTypes.headType, 'head');
+    await drawOption('armsType', state.selectedTypes.armsType, 'arms');
+    await drawOption('torsoType', state.selectedTypes.torsoType, 'torso');
+    await drawOption('legsType', state.selectedTypes.legsType, 'legs');
+    await drawOption('toolsType', state.selectedTypes.toolsType, 'tools');
+    await drawOption('weaponsType', state.selectedTypes.weaponsType, 'weapons');
+  
+    const combinedImageUrl = canvas.toDataURL('image/png');
+    return combinedImageUrl;
+  };
+  
+  // Function to save an image to IPFS
+  const saveImageToIPFS = async (imageDataUrl) => {
+    try {
+      const data = imageDataUrl.split(',')[1];
+      const buffer = Buffer.from(data, 'base64');
+      
+      // Add the image to IPFS
+      const result = await ipfsClient.add(buffer);
+      
+      // Return the IPFS path of the uploaded image
+      return result.path;
+    } catch (error) {
+      console.error('Error uploading image to IPFS:', error);
+      throw new Error('Error uploading image to IPFS');
+    }
+  };
+
+  // Function to save metadata to IPFS
+  const saveMetadataToIPFS = async (metadata) => {
+  try {
+    // Convert metadata object to a JSON string
+    const metadataJson = JSON.stringify(metadata);
+    
+    // Add the metadata to IPFS
+    const result = await ipfsClient.add(metadataJson);
+    
+    // Return the IPFS path of the uploaded metadata
+    return result.path;
+  } catch (error) {
+    console.error('Error uploading metadata to IPFS:', error);
+    throw new Error('Error uploading metadata to IPFS');
+  }
+  };
+  const mint = async () => {
+      
+        try {
+          const combinedImageUrl = await createCombinedImage();
+          const ipfsHash = await saveImageToIPFS(combinedImageUrl);
+          const imageIPFSUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
+          //console.log(`Minting NFT with fighter: ${fighter}, weapon: ${weapon}, name: ${nftName}, price: ${price}, image: ${imageIPFSUrl}`);
+          
+          // Create NFT metadata
+          const metadata = {
+            name: nftName,
+            description: `A unique character with ${fighter} and ${weapon}`,
+            image: imageIPFSUrl,
+          };
+          
+          //Save metadata to IPFS
+          const metadataIPFSHash = await saveMetadataToIPFS(metadata);
+          const metadataIPFSUrl = `https://ipfs.io/ipfs/${metadataIPFSHash}`;
+
+          let price = ethers.utils.parseEther(state.price.toString())
+          let overrides = {
+            
+            from: accounts[0],
+            value: price,
+          }
+
+          createPendingRequest();
+          const receipt = await mintNFT(price, metadataUrl, overrides);
+          await receipt.wait();
+          //console.log(`Successfully minted NFT name: ${nftName}, price: ${price}, image: ${imageIPFSUrl}`)
+          sendCharacteristicsToServer();
+        }
+        catch(err) {
+          setError(err.message);
+        }
+    };
+    
+    
+    // Interact with your smart contract to mint the NFT and include the metadata
+    // Add your smart contract interaction code 
+
   return (
     <div className="text-white bg-transparent p-4">
       <div className="mb-4">
@@ -393,128 +292,33 @@ const mintNFT = async () => {
         <input
           type="text"
           id="nftName"
-          value={nftName}
-          onChange={handleNftNameChange}
+          value={initialState.nftName}
+          //onChange={handleNftNameChange}
           className="w-1/2 px-3 py-2 bg-gray-800 text-white border rounded"
         />
       </div>
       <div className="flex justify-between">
         <div className="w-1/2">
-          <div id="accordion-collapse" data-accordion="collapse">
-            {/* Body Accordion */}
-    <h2>
-      <button
-        type="button"
-        className={`flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-gray-200 rounded-xl ml-0 m-2 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 ${isBodyOpen ? 'bg-gray-100 dark:bg-gray-800' : ''}`}
-        onClick={handleBodyAccordionToggle}
-        aria-expanded={isBodyOpen}
-      >
-        <span>Body</span>
-        <AccordionIcon isOpen={isBodyOpen} />
-      </button>
-    </h2>
-    {isBodyOpen && bodyAccordionContent}
-
-    {/* Head Accordion */}
-    <h2>
-      <button
-        type="button"
-        className={`flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-gray-200 rounded-xl ml-0 m-2 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 ${isHeadOpen ? 'bg-gray-100 dark:bg-gray-800' : ''}`}
-        onClick={handleHeadAccordionToggle}
-        aria-expanded={isHeadOpen}
-      >
-        <span>Head</span>
-        <AccordionIcon isOpen={isHeadOpen} />
-      </button>
-    </h2>
-    {isHeadOpen && headAccordionContent}
-
-    {/* Arms Accordion */}
-    <h2>
-      <button
-        type="button"
-        className={`flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-gray-200 rounded-xl ml-0 m-2 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 ${isArmsOpen ? 'bg-gray-100 dark:bg-gray-800' : ''}`}
-        onClick={handleArmsAccordionToggle}
-        aria-expanded={isArmsOpen}
-      >
-        <span>Arms</span>
-        <AccordionIcon isOpen={isArmsOpen} />
-      </button>
-    </h2>
-    {isArmsOpen && armsAccordionContent}
-
-    {/* Torso Accordion */}
-    <h2>
-      <button
-        type="button"
-        className={`flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-gray-200 rounded-xl ml-0 m-2 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 ${isTorsoOpen ? 'bg-gray-100 dark:bg-gray-800' : ''}`}
-        onClick={handleTorsoAccordionToggle}
-        aria-expanded={isTorsoOpen}
-      >
-        <span>Torso</span>
-        <AccordionIcon isOpen={isTorsoOpen} />
-      </button>
-    </h2>
-    {isTorsoOpen && torsoAccordionContent}
-
-    {/* Legs Accordion */}
-    <h2>
-      <button
-        type="button"
-        className={`flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-gray-200 rounded-xl ml-0 m-2 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 ${isLegsOpen ? 'bg-gray-100 dark:bg-gray-800' : ''}`}
-        onClick={handleLegsAccordionToggle}
-        aria-expanded={isLegsOpen}
-      >
-        <span>Legs</span>
-        <AccordionIcon isOpen={isLegsOpen} />
-      </button>
-    </h2>
-    {isLegsOpen && legsAccordionContent}
-
-    {/* Tools Accordion */}
-    <h2>
-      <button
-        type="button"
-        className={`flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-gray-200 rounded-xl ml-0 m-2 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 ${isToolsOpen ? 'bg-gray-100 dark:bg-gray-800' : ''}`}
-        onClick={handleToolsAccordionToggle}
-        aria-expanded={isToolsOpen}
-      >
-        <span>Tools</span>
-        <AccordionIcon isOpen={isToolsOpen} />
-      </button>
-    </h2>
-    {isToolsOpen && toolsAccordionContent}
-
-    {/* Weapons Accordion */}
-    <h2>
-      <button
-        type="button"
-        className={`flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-gray-200 rounded-xl ml-0 m-2 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 ${isWeaponsOpen ? 'bg-gray-100 dark:bg-gray-800' : ''}`}
-        onClick={handleWeaponsAccordionToggle}
-        aria-expanded={isWeaponsOpen}
-      >
-        <span>Weapons</span>
-        <AccordionIcon isOpen={isWeaponsOpen} />
-      </button>
-    </h2>
-    {isWeaponsOpen && weaponsAccordionContent}
+        <div id="accordion-collapse" data-accordion="collapse">
+          {accordionItems.map(renderAccordionItem)}
         </div>
         </div>
         <div className="w-1/2 relative ml-3">
+          
     {/* Add the superposed layers here */}
-    {weaponsType && <img className="absolute" src={`/static/images/weapon/${weaponsType}.png`} alt={weaponsType} />}
-    {bodyType && <img className="absolute" src={`/static/images/body/${bodyType}.png`} alt={bodyType} />}
-    {headType && <img className="absolute" src={`/static/images/head/${headType}.png`} alt={headType} />}
-    {armsType && <img className="absolute" src={`/static/images/arms/${armsType}.png`} alt={armsType} />}
-    {torsoType && <img className="absolute" src={`/static/images/torso/${torsoType}.png`} alt={torsoType} />}
-    {legsType && <img className="absolute" src={`/static/images/legs/${legsType}.png`} alt={legsType} />}
-    {toolsType && <img className="absolute" src={`/static/images/tools/${toolsType}.png`} alt={toolsType} />}
-</div>
+    {state.selectedTypes.weaponsType && <img className="absolute" src={`/static/images/weapon/${state.selectedTypes.weaponsType}.png`} alt={state.selectedTypes.weaponsType} />}
+    {state.selectedTypes.bodyType && <img className="absolute" src={`/static/images/body/${state.selectedTypes.bodyType}.png`} alt={state.selectedTypes.bodyType} />}
+    {state.selectedTypes.headType && <img className="absolute" src={`/static/images/head/${state.selectedTypes.headType}.png`} alt={state.selectedTypes.headType} />}
+    {state.selectedTypes.armsType && <img className="absolute" src={`/static/images/arms/${state.selectedTypes.armsType}.png`} alt={state.selectedTypes.armsType} />}
+    {state.selectedTypes.torsoType && <img className="absolute" src={`/static/images/torso/${state.selectedTypes.torsoType}.png`} alt={state.selectedTypes.torsoType} />}
+    {state.selectedTypes.legsType && <img className="absolute" src={`/static/images/legs/${state.selectedTypes.legsType}.png`} alt={state.selectedTypes.legsType} />}
+    {state.selectedTypes.toolsType && <img className="absolute" src={`/static/images/tools/${state.selectedTypes.toolsType}.png`} alt={state.selectedTypes.toolsType} />}
+    </div>
       </div>
       <div className="text-center mt-4">
-        <p>Total Price: {price} ETH</p>
+        <p>Total Price: {state.price} ETH</p>
         {/* <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded" onClick={mintNFT}> */}
-        <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded" >
+        <button  className="mt-2 px-4 py-2 bg-blue-600 text-white rounded" >
           Mint NFT
         </button>
       </div>

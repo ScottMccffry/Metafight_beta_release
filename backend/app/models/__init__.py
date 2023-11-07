@@ -8,3 +8,4 @@ from .bets import Bets
 from .transactions import Transactions
 from .gamestatistics import GameStatistics
 from .bids import Bids
+from .pending import Pending

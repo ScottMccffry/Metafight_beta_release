@@ -36,7 +36,7 @@ contract MetaFight is ERC721Enumerable, Ownable {
   }
 
   // Public function to mint NFTs
-  function mint(uint256 _nftPrice) public payable { 
+  function mint(uint256 _nftPrice, string calldata _metadataURI) public payable { 
     require(!paused, "the contract is paused");
     uint256 supply = totalSupply();
 
@@ -48,7 +48,7 @@ contract MetaFight is ERC721Enumerable, Ownable {
     addressMintedBalance[msg.sender]++;
     uint256 tokenId = supply + 1;
     _safeMint(msg.sender, tokenId);
-    _setTokenURI(tokenId, baseURI);
+    _setTokenURI(tokenId, _metadataURI);
 }
 
   // Internal function to set token URI

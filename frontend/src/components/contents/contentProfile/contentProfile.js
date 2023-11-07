@@ -3,15 +3,39 @@ import axios from 'axios';
 import UnifiedContext from '../../../context/UnifiedContext';
 import FightModal from '../../fightModal/fightModal';
 import WidgetTableProfile from '../../widgetTableProfile/widgetTableProfile.js';
-
+const AlchemyBaseURL = process.env.ALCHEMY_BASE_URL;
 
 function ContentProfile({userData}) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { isConnected } = useContext(UnifiedContext);
+  const [nfts, setNfts] = useState(null);
+  const [error, setError] = useState('');
 
   const handleButtonClick = () => {
     setIsModalVisible(true);
   };
+ 
+  const fetchUsersNfts = async () => {
+    // Wallet address
+    const address = userData.walletAddress;
+
+    // Alchemy URL
+    
+    const url = `${AlchemyBaseURL}/getNFTs/?owner=${address}`;
+
+    try {
+      const response = await axios.get(url);
+      setNfts(response.data);
+    } catch (err) {
+      setError('An error occurred while fetching NFTs');
+      console.error('error', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsersNfts();
+  }, []); // The empty array ensures this effect runs once on mount
+
 
   const closeModal = () => {
     setIsModalVisible(false);
@@ -53,6 +77,11 @@ function ContentProfile({userData}) {
   class="text-white py-2 px-4 uppercase rounded bg-gray-300 hover:bg-gray-800 shadow hover:shadow-lg font-medium transition transform hover:-translate-y-0.5"
 >
   Message
+</button>
+<button onClick={fetchUsersNfts}
+  class="text-white py-2 px-4 uppercase rounded bg-gray-300 hover:bg-gray-800 shadow hover:shadow-lg font-medium transition transform hover:-translate-y-0.5"
+>
+  Fetch NFTs
 </button>
     </div>
   </div>

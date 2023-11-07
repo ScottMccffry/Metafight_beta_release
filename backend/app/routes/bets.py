@@ -5,7 +5,6 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from web3 import Web3
 from app.database import db
-web3 = Web3(Web3.HTTPProvider("http://localhost:8545"))  # Assuming your Ethereum node is running locally
 limiter = Limiter(key_func=get_remote_address)
 
 bets_routes = Blueprint('bets_routes', __name__)

@@ -18,6 +18,7 @@ def register_routes(app):
     app.register_blueprint(bets_routes)
     app.register_blueprint(bid_routes)
     app.register_blueprint(collection_routes)
+    app.register_blueprint(pending_routes)
 
 # Socket.io requires a slightly different setup than standard Flask routes
 
