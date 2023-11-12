@@ -51,16 +51,35 @@ const CardStack = () => {
     setCardOrder(newOrder);
   };
 
-  // Function to log when the "Stake" action is taken
-  const Stake = () => {
-    console.log("View Specs Clicked");
-  };
+  
 
   // Function to log when the "Unstake" action is taken
   const Unstake = () => {
     console.log("View Sale Clicked");
   };
+// Assuming you have a function to send the staking request to your backend
+const sendStakeRequest = async (nft_address) => {
+  try {
+    const response = await axios.post('/api/stake_request/', { nft_address });
+    return response.data; // Contains status and possibly a transaction ID
+  } catch (error) {
+    console.error('Error sending stake request:', error);
+    throw error; // Re-throw the error to be handled by the calling function
+  }
+};
 
+// Function to initiate the staking process
+const Stake = async (nft_address) => {
+  try {
+    const stakeResponse = await sendStakeRequest(nft_address);
+    console.log("Stake request sent:", stakeResponse);
+    const receipt = await stakeNFT(nft_address);
+    await receipt.wait();
+    // Further actions can be taken here depending on the response
+  } catch (error) {
+    // Handle errors, such as showing an alert or updating the state
+  }
+};
   // Component's return (UI part)
   return (
     <div className='h-4/5 w-4/5 '>

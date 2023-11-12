@@ -9,6 +9,8 @@ export const BlockchainProvider = ({ children }) => {
     const contract = new ethers.Contract(
       process.env.REACT_APP_CONTRACT_ADDRESS,
       process.env.REACT_APP_CONTRACT_ABI,
+      process.env.REACT_STAKE_CONTRACT_ADDRESS,
+      process.env.REACT_STAKE_CONTRACT_ABI,
       signer
     );
   
@@ -26,7 +28,23 @@ export const BlockchainProvider = ({ children }) => {
       }, [contract]);
     
     
-
+async function stakeNFT(nft_address) {
+      if (typeof window.ethereum === 'undefined') {
+        throw new Error('Ethereum wallet is not connected');
+        }
+      
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(process.env.REACT_APP_STAKE_CONTRACT_ADDRESS, REACT_APP_STAKE_CONTRACT_ADDRESS, signer);
+      
+      // Assuming your contract has a stake method
+      const transaction = await contract.stake(nft_address, { from: accounts[0] });
+      const receipt = await transaction.wait();
+      
+        // Return receipt or transaction details
+      return receipt;
+      }
 // Helper function to mint NFT on blockchain
 async function mintNFT(price, metadataUrl, overrides) {
   if (typeof window.ethereum === 'undefined') {
@@ -49,7 +67,7 @@ async function mintNFT(price, metadataUrl, overrides) {
 }
 
     return (
-      <BlockchainContext.Provider value={{ mintNFT }}>
+      <BlockchainContext.Provider value={{ mintNFT, stakeNFT }}>
         {children}
       </BlockchainContext.Provider>
     );

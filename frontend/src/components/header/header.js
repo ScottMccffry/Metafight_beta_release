@@ -7,6 +7,7 @@ import axios from 'axios';
 
 // Local constant for the API base URL
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
+const ALCHEMY_BASE_URL=process.env.ALCHEMY_BASE_URL
 // `Header` component definition
 function Header() {
   // Context hooks to get wallet and authentication states and functions
@@ -43,6 +44,26 @@ function Header() {
     }
   }, [userAddress]);
 
+  const fetchUsersNfts = async () => {
+    // Wallet address
+    const address = userAddress;
+
+
+    const url = `${ALCHEMY_BASE_URL}/getNFTs/?owner=${address}`;
+
+    try {
+      const response = await axios.get(url);
+      setNfts(response.data);
+    } catch (err) {
+      setError('An error occurred while fetching NFTs');
+      console.error('error', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsersNfts();
+  }, []); // The empty array ensures this effect runs once on mount
+
   // Effect hook to fetch user data whenever the `userId` changes
   useEffect(() => {
     fetchUserData();
@@ -67,6 +88,7 @@ function Header() {
     console.log('connecting wallet');
 
     connectWallet();
+    fetchUsersNFTs();
   }
 
   const usernameLoginClick = () => {
