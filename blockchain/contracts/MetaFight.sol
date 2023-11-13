@@ -20,6 +20,7 @@ contract MetaFight is ERC721Enumerable, Ownable {
   address[] public whitelistedAddresses;
   mapping(address => uint256) public addressMintedBalance;
   mapping(uint256 => string) private _tokenURIs;
+  event MintConfirmed(uint256 indexed tokenId, address owner);
 
   // Constructor function
   constructor(
@@ -36,20 +37,24 @@ contract MetaFight is ERC721Enumerable, Ownable {
   }
 
   // Public function to mint NFTs
-  function mint(uint256 _nftPrice, string calldata _metadataURI) public payable { 
-    require(!paused, "the contract is paused");
-    uint256 supply = totalSupply();
-
-    if (msg.sender != owner()) {
-        require(msg.value >= _nftPrice, "insufficient funds");
-    }
+    // Public function to mint NFTs
+    function mint(uint256 _nftPrice, string calldata _metadataURI) public payable {
+        require(!paused, "the contract is paused");
+        uint256 supply = totalSupply();
         
-    // Mint the NFT
-    addressMintedBalance[msg.sender]++;
-    uint256 tokenId = supply + 1;
-    _safeMint(msg.sender, tokenId);
-    _setTokenURI(tokenId, _metadataURI);
-}
+        if (msg.sender != owner()) {
+            require(msg.value >= _nftPrice, "insufficient funds");
+        }
+        
+        // Mint the NFT
+        addressMintedBalance[msg.sender]++;
+        uint256 tokenId = supply + 1;
+        _safeMint(msg.sender, tokenId);
+        _setTokenURI(tokenId, _metadataURI);
+
+        // Emit the MintConfirmed event
+        emit MintConfirmed(tokenId, msg.sender);
+    }
 
   // Internal function to set token URI
   function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
