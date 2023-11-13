@@ -6,69 +6,92 @@ import BlockchainContext from './BlockchainContext.js'
 export const BlockchainProvider = ({ children }) => {
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = provider.getSigner();
-    const contract = new ethers.Contract(
-      process.env.REACT_APP_CONTRACT_ADDRESS,
-      process.env.REACT_APP_CONTRACT_ABI,
-      process.env.REACT_STAKE_CONTRACT_ADDRESS,
-      process.env.REACT_STAKE_CONTRACT_ABI,
+  
+  
+    // Assuming you have separate contracts for minting and staking
+    const mintContract = new ethers.Contract(
+      process.env.REACT_APP_NFT_CONTRACT_ADDRESS,
+      process.env.REACT_APP_NFT_CONTRACT_ABI,
       signer
     );
   
+    const stakeContract = new ethers.Contract(
+      process.env.REACT_APP_STAKE_CONTRACT_ADDRESS,
+      process.env.REACT_APP_STAKE_CONTRACT_ABI,
+      signer
+    );
+    const poolContract = new ethers.Contract(
+      process.env.REACT_APP_POOL_CONTRACT_ADDRESS,
+      process.env.REACT_APP_POOL_CONTRACT_ABI,
+      signer
+    );
+  //event listener for transaction confirmation
     useEffect(() => {
-        // Listen for contract events
-        contract.on('MintConfirmed', (tokenId, owner) => {
-          // Handle mint confirmation
-          console.log(`Mint was confirmed for token ID: ${tokenId} and owner: ${owner}`);
-        });
-    
-        // Cleanup the event listener when the component unmounts
-        return () => {
-          contract.removeAllListeners('MintConfirmed');
-        };
-      }, [contract]);
-    
-    
-async function stakeNFT(nft_address) {
-      if (typeof window.ethereum === 'undefined') {
-        throw new Error('Ethereum wallet is not connected');
+      // Listen for mint confirmation events
+      mintContract.on('MintConfirmed', (tokenId, owner) => {
+        console.log(`Mint was confirmed for token ID: ${tokenId} and owner: ${owner}`);
+      });
+  
+      // Listen for stake confirmation events
+      stakeContract.on('StakeConfirmed', (tokenId, staker) => {
+        console.log(`Stake was confirmed for token ID: ${tokenId} and staker: ${staker}`);
+        // Here you can make an API call to your backend to update the staking status
+      });
+  
+      // Cleanup the event listeners when the component unmounts
+      return () => {
+        mintContract.removeAllListeners('MintConfirmed');
+        stakeContract.removeAllListeners('StakeConfirmed');
+      };
+    }, [mintContract, stakeContract]);
+
+  async function stakeNFT(nft_address) {
+        console.log("Stake NFT provider")
+        if (typeof window.ethereum === 'undefined') {
+          throw new Error('Ethereum wallet is not connected');
+          }
+        
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(process.env.REACT_APP_STAKE_CONTRACT_ADDRESS, REACT_APP_STAKE_CONTRACT_ADDRESS, signer);
+        
+        // Assuming your contract has a stake method
+        const transaction = await contract.stake(nft_address, { from: accounts[0] });
+        const receipt = await transaction.wait();
+        
+          // Return receipt or transaction details
+        return receipt;
         }
-      
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(process.env.REACT_APP_STAKE_CONTRACT_ADDRESS, REACT_APP_STAKE_CONTRACT_ADDRESS, signer);
-      
-      // Assuming your contract has a stake method
-      const transaction = await contract.stake(nft_address, { from: accounts[0] });
-      const receipt = await transaction.wait();
-      
-        // Return receipt or transaction details
-      return receipt;
-      }
-// Helper function to mint NFT on blockchain
-async function mintNFT(price, metadataUrl, overrides) {
-  if (typeof window.ethereum === 'undefined') {
-    throw new Error('Ethereum wallet is not connected');
+  // Helper function to mint NFT on blockchain
+  async function mintNFT(price, metadataUrl, overrides) {
+    console.log("Mint NFT provider")
+    if (typeof window.ethereum === 'undefined') {
+      throw new Error('Ethereum wallet is not connected');
+    }
+
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = provider.getSigner();
+    //here MFT.abi necessary
+    const contract = new ethers.Contract(process.env.REACT_APP_NFT_CONTRACT_ADDRESS, NFT_ABI, signer);
+
+    // Here you would call the appropriate smart contract method to mint the NFT
+    // Replace with your actual minting method parameters
+    const transaction = await contract.mint(price,metadataUrl,overrides);
+    const receipt = await transaction.wait();
+
+    // Return transaction details or receipt
+    return receipt;
   }
 
-  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-  const provider = new ethers.BrowserProvider(window.ethereum);
-  const signer = provider.getSigner();
-  //here MFT.abi necessary
-  const contract = new ethers.Contract(process.env.REACT_APP_NFT_CONTRACT_ADDRESS, NFT_ABI, signer);
+  async function buyCredits(){
+    console.log("Buy Credits Provider")
+  }
 
-  // Here you would call the appropriate smart contract method to mint the NFT
-  // Replace with your actual minting method parameters
-  const transaction = await contract.mint(price,metadataUrl,overrides );
-  const receipt = await transaction.wait();
-
-  // Return transaction details or receipt
-  return receipt;
-}
-
-    return (
-      <BlockchainContext.Provider value={{ mintNFT, stakeNFT }}>
+  return (
+      <BlockchainContext.Provider value={{ mintNFT, stakeNFT, buyCredits }}>
         {children}
       </BlockchainContext.Provider>
-    );
+  );
   };
