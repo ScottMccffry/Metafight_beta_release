@@ -7,27 +7,30 @@ class Pending(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     nft_address= db.Column(db.String(50), nullable=False, unique=True)
-    characteristics = db.Column(db.JSON, nullable=False)
+    data_to_validate = db.Column(db.JSON, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     request_type = db.Column(db.Integer)
     status = db.Column(db.String(50), nullable=False, default='pending')  # 'pending', 'confirmed', or 'failed'
 
-    def __init__(self, characteristics):
-        self.characteristics = characteristics
+    def __init__(self, nft_address, data_to_validate, request_type, status='pending'):
+            self.nft_address = nft_address
+            self.data_to_validate = data_to_validate
+            self.request_type = request_type
+            self.status = status
 
     def commit_mint(self):
         # Logic to commit the mint, potentially moving it to a confirmed state
         self.transaction_hash = 'your_transaction_hash_here'
         self.status = 'confirmed'
         db.session.commit()
-        pass
+        return self.id
 
-    def rollback_mint(self):
+    def rollback_mint(self,pending_id):
         # Logic to rollback the mint if necessary
-        mint_entry = Pending.query.get(mint_id)
-        if mint_entry:
+        pending_entry = Pending.query.get(pending_id)
+        if pending_entry:
             # Update the mint entry to reflect the rollback
-            mint_entry.status = 'rollback'
+            pending_entry.status = 'rollback'
             db.session.commit()
 
     def update_pending_mint_status(mint_id, status):

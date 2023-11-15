@@ -20,7 +20,7 @@ contract MetaFight is ERC721Enumerable, Ownable {
   address[] public whitelistedAddresses;
   mapping(address => uint256) public addressMintedBalance;
   mapping(uint256 => string) private _tokenURIs;
-  event MintConfirmed(uint256 indexed tokenId, address owner);
+  event MintConfirmed(uint256 indexed tokenId, address owner, uint256 pending_id);
 
   // Constructor function
   constructor(
@@ -38,7 +38,7 @@ contract MetaFight is ERC721Enumerable, Ownable {
 
   // Public function to mint NFTs
     // Public function to mint NFTs
-    function mint(uint256 _nftPrice, string calldata _metadataURI) public payable {
+    function mint(uint256 _nftPrice, string calldata _metadataURI, uint256 _pending_id) public payable {
         require(!paused, "the contract is paused");
         uint256 supply = totalSupply();
         
@@ -53,7 +53,7 @@ contract MetaFight is ERC721Enumerable, Ownable {
         _setTokenURI(tokenId, _metadataURI);
 
         // Emit the MintConfirmed event
-        emit MintConfirmed(tokenId, msg.sender);
+        emit MintConfirmed(tokenId, msg.sender,_pending_id);
     }
 
   // Internal function to set token URI

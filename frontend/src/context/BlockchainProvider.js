@@ -28,8 +28,19 @@ export const BlockchainProvider = ({ children }) => {
   //event listener for transaction confirmation
     useEffect(() => {
       // Listen for mint confirmation events
-      mintContract.on('MintConfirmed', (tokenId, owner) => {
-        console.log(`Mint was confirmed for token ID: ${tokenId} and owner: ${owner}`);
+      mintContract.on('MintConfirmed', (tokenId, owner, pending_id, event) => {
+        console.log(`Mint was confirmed for token ID: ${tokenId} and owner: ${owner} and pending ID: ${pending_id} `);
+        const sendCharacteristicsToServer = async () => {
+          try {
+            // Replace with your actual API endpoint
+            const response = await axios.post('/api/confirm-mint/', {owner, pending_id });
+            console.log('mint confirmed');
+          } catch (error) {
+            console.error('Error sending characteristics:', error);
+            throw new Error('Failed to send characteristics to server');
+          }
+        };
+
       });
   
       // Listen for stake confirmation events
@@ -64,7 +75,7 @@ export const BlockchainProvider = ({ children }) => {
         return receipt;
         }
   // Helper function to mint NFT on blockchain
-  async function mintNFT(price, metadataUrl, overrides) {
+  async function mintNFT(price, metadataUrl, pending_id, overrides) {
     console.log("Mint NFT provider")
     if (typeof window.ethereum === 'undefined') {
       throw new Error('Ethereum wallet is not connected');
@@ -78,7 +89,7 @@ export const BlockchainProvider = ({ children }) => {
 
     // Here you would call the appropriate smart contract method to mint the NFT
     // Replace with your actual minting method parameters
-    const transaction = await contract.mint(price,metadataUrl,overrides);
+    const transaction = await contract.mint(price, metadataUrl, pending_id ,overrides);
     const receipt = await transaction.wait();
 
     // Return transaction details or receipt

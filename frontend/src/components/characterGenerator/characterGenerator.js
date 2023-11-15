@@ -244,6 +244,21 @@ const CharacterGenerator = () => {
     throw new Error('Error uploading metadata to IPFS');
   }
   };
+
+  const createPendingRequest = async (pending_data) => {
+    try {
+      // Replace with your actual API endpoint
+      const response = await axios.post('/api/mint_request/', { pending_data });
+      console.log('Pending request created:', response.data);
+      return response.data.id
+    } catch (error) {
+      console.error('Error creating pending request:', error);
+      throw new Error('Failed to create pending request');
+    }
+  };
+
+  
+
   const mint = async () => {
       
         try {
@@ -269,12 +284,26 @@ const CharacterGenerator = () => {
             from: accounts[0],
             value: price,
           }
+          // Prepare the fighter data to be sent to the backend
+          const fighterData = {
+            name: nftName, // The name of the NFT
+            collection_address: 'COLLECTION_ADDRESS_HERE', // Placeholder for collection address
+            image: imageIPFSUrl, // URL of the image on IPFS
+            owner_nft_address: 'OWNER_NFT_ADDRESS_HERE', // Placeholder for owner's NFT address
+            // The NFT address will be available after minting, so initially, it can be empty or a placeholder
+            nft_address: 'NFT_ADDRESS_TO_BE_UPDATED_AFTER_MINTING',
+            // You may want to include the entire metadata or specific parts of it
+            game_characteristics_json: JSON.stringify(metadata),
+            handler: 'HANDLER_INFORMATION_HERE', // Placeholder for handler information
+            rank: 'RANK_INFORMATION_HERE', // Placeholder for rank information
+            // Add any other relevant fields that are required for the fighter
+          };
 
-          createPendingRequest();
-          const receipt = await mintNFT(price, metadataUrl, overrides);
+          pending_id=createPendingRequest(fighterData);
+          const receipt = await mintNFT(price, metadataIPFSUrl, pending_id, overrides);
           await receipt.wait();
-          //console.log(`Successfully minted NFT name: ${nftName}, price: ${price}, image: ${imageIPFSUrl}`)
-          sendCharacteristicsToServer();
+          console.log(`Successfully minted NFT name: ${nftName}, price: ${price}, image: ${imageIPFSUrl}`)
+          console.log('waiting for confirmation to pending DB')
         }
         catch(err) {
           setError(err.message);
