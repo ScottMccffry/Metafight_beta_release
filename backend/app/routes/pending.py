@@ -1,12 +1,15 @@
 from flask import request, jsonify, Blueprint
-from app.models import db, Pending
+from app.models import Pending
+from app.database import db
 from sqlalchemy.exc import SQLAlchemyError
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
 import json
+
 scheduler = BackgroundScheduler()
 
 pending_routes = Blueprint('pending_routes', __name__)
+
 @pending_routes.route('/api/mint_request/', methods=['POST'])
 def receive_mint_request():
     data_json = request.json.get('data')
@@ -36,8 +39,6 @@ def receive_mint_request():
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
-    
-    
 @pending_routes.route('/api/mint_confirm/', methods=['POST'])
 def confirm_mint():
     data = request.json
@@ -61,7 +62,6 @@ def confirm_mint():
             return jsonify({'status': 'error', 'message': str(e)}), 500
     else:
         return jsonify({'status': 'error', 'message': 'Mint ID not found'}), 404
-
 
 
 # Flask route to handle the staking request

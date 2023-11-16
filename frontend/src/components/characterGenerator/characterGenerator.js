@@ -3,6 +3,8 @@ import React, { useState, useReducer, useContext } from 'react';
 import { ethers } from 'ethers';
 import { create } from 'ipfs-http-client';
 import BlockchainContext from '../../context/BlockchainContext';
+import UnifiedContext from '../../context/UnifiedContext';
+import axios from 'axios';
 //@TO DO Put real INFURA link
 const ipfsClient = create('https://ipfs.infura.io:5001/api/v0');
 
@@ -97,7 +99,12 @@ const reducer = (state, action) => {
 const CharacterGenerator = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { mintNFT } = useContext(BlockchainContext);
-
+  const {
+    isAuthenticated,
+    userAddress,
+   
+  } = useContext(UnifiedContext);
+  const [error, setError] = useState(null);
 
   const handleAccordionToggle = (section) => {
     dispatch({ type: 'TOGGLE_ACCORDION', section });
@@ -257,20 +264,53 @@ const CharacterGenerator = () => {
     }
   };
 
+  const generateCharacterDescription = () => {
+    // List to hold descriptions of each selected type
+    let descriptions = [];
   
+    // Check each selected type and create a description part for it
+    if (state.selectedTypes.bodyType) {
+      descriptions.push(`Body Type: ${state.selectedTypes.bodyType}`);
+    }
+    if (state.selectedTypes.headType) {
+      descriptions.push(`Head Type: ${state.selectedTypes.headType}`);
+    }
+    if (state.selectedTypes.armsType) {
+      descriptions.push(`Arms Type: ${state.selectedTypes.armsType}`);
+    }
+    if (state.selectedTypes.torsoType) {
+      descriptions.push(`Torso Type: ${state.selectedTypes.torsoType}`);
+    }
+    if (state.selectedTypes.legsType) {
+      descriptions.push(`Legs Type: ${state.selectedTypes.legsType}`);
+    }
+    if (state.selectedTypes.toolsType) {
+      descriptions.push(`Tools: ${state.selectedTypes.toolsType}`);
+    }
+    if (state.selectedTypes.weaponsType) {
+      descriptions.push(`Weapon: ${state.selectedTypes.weaponsType}`);
+    }
+  
+    // Combine all descriptions into a single string
+    return descriptions.length > 0 ? `A unique character with ${descriptions.join(', ')}` : 'A unique character';
+  };
 
-  const mint = async () => {
+  const mint = async (nftName) => {
       
         try {
+          if (!userAddress) {
+            console.error('Wallet is not connected.');
+            return;
+          }
           const combinedImageUrl = await createCombinedImage();
           const ipfsHash = await saveImageToIPFS(combinedImageUrl);
           const imageIPFSUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
           //console.log(`Minting NFT with fighter: ${fighter}, weapon: ${weapon}, name: ${nftName}, price: ${price}, image: ${imageIPFSUrl}`);
-          
+          const characterDescription = generateCharacterDescription();
           // Create NFT metadata
           const metadata = {
             name: nftName,
-            description: `A unique character with ${fighter} and ${weapon}`,
+            description: characterDescription,
             image: imageIPFSUrl,
           };
           
@@ -278,10 +318,10 @@ const CharacterGenerator = () => {
           const metadataIPFSHash = await saveMetadataToIPFS(metadata);
           const metadataIPFSUrl = `https://ipfs.io/ipfs/${metadataIPFSHash}`;
 
-          let price = ethers.utils.parseEther(state.price.toString())
+          let price = ethers.parseEther(state.price.toString())
           let overrides = {
             
-            from: accounts[0],
+            from: userAddress,
             value: price,
           }
           // Prepare the fighter data to be sent to the backend
@@ -299,7 +339,7 @@ const CharacterGenerator = () => {
             // Add any other relevant fields that are required for the fighter
           };
 
-          pending_id=createPendingRequest(fighterData);
+          const pending_id = createPendingRequest(fighterData);
           const receipt = await mintNFT(price, metadataIPFSUrl, pending_id, overrides);
           await receipt.wait();
           console.log(`Successfully minted NFT name: ${nftName}, price: ${price}, image: ${imageIPFSUrl}`)

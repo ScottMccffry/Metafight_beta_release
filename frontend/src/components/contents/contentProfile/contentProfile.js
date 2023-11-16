@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext,useEffect } from 'react';
 import axios from 'axios';
 import UnifiedContext from '../../../context/UnifiedContext';
 import FightModal from '../../fightModal/fightModal';

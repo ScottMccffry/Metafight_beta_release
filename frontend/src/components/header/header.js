@@ -24,6 +24,8 @@ function Header() {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(null);
   const [openDropdownMenu, setOpenDropdownMenu] = useState(false);
+  const [error, setError] = useState(null);
+  const [nfts,setNfts] = useState(null);
 
   // Hook for navigation
   const navigate = useNavigate();
@@ -88,7 +90,7 @@ function Header() {
     console.log('connecting wallet');
 
     connectWallet();
-    fetchUsersNFTs();
+    fetchUsersNfts();
   }
 
   const usernameLoginClick = () => {

@@ -25,7 +25,9 @@ const FightModal = ({ closeModal }) => {
   const [compatibleNfts, setCompatibleNfts] = useState([]); // For storing compatible NFTs
   const [selectedNft, setSelectedNft] = useState('');
   const [error, setError] = useState('');
-
+  const [searchInitiated, setSearchInitiated] = useState(false);
+  const [progress, setProgress] = useState(0);
+  
   // Effect hook to fetch the user's NFT collections when the component mounts
   useEffect(() => {
     const fetchNftCollections = async () => {

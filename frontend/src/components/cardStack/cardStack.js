@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import UnifiedContext from '../../context/UnifiedContext';
+import BlockchainContext from '../../context/BlockchainContext';
 
 
 // Predefined array of colors
@@ -13,7 +14,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 const CardStack = () => {
 
   const { isConnected, connectWallet, isAuthenticated, userId, userAddress, loginUser } = useContext(UnifiedContext);
-
+ const  { stakeNFT } = useContext(BlockchainContext); 
   // State to keep track of card order
   const [cardOrder, setCardOrder] = useState(colors);
 
