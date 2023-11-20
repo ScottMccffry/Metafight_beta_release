@@ -9,7 +9,7 @@ from .bids import bid_routes
 from .collection import collection_routes
 from .pending  import pending_routes
 from .websocket import socketio  # Import socketio object from websocket.py
-
+from .pending import pending_routes
 def register_routes(app):
     app.register_blueprint(marketplace_routes)
     app.register_blueprint(general_routes)
@@ -20,6 +20,7 @@ def register_routes(app):
     app.register_blueprint(bets_routes)
     app.register_blueprint(bid_routes)
     app.register_blueprint(collection_routes)
+    app.register_blueprint(pending_routes)
  
 
 # Socket.io requires a slightly different setup than standard Flask routes

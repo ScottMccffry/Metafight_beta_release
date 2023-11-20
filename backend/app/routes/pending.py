@@ -5,6 +5,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
 import json
+import ipfshttpclient
+import base64
+import os
+INFURA_PROJECT_ID = os.getenv('INFURA_PROJECT_ID')
+INFURA_PROJECT_SECRET = os.getenv('INFURA_PROJECT_SECRET')
 
 scheduler = BackgroundScheduler()
 
@@ -38,6 +43,26 @@ def receive_mint_request():
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+@pending_routes.route('/api/upload_to_ipfs/', methods=['POST'])
+def upload_to_ipfs():
+    try:
+        image_data = request.json.get('imageData')
+        image_bytes = base64.b64decode(image_data.split(',')[1])
+        print(f"decode ok")
+        print(f"{INFURA_PROJECT_ID}")
+        print(f"{INFURA_PROJECT_SECRET}")
+
+        client = ipfshttpclient.connect(
+            '/dns/ipfs.infura.io/tcp/5001/https',
+            auth=(os.environ[INFURA_PROJECT_ID], os.environ[INFURA_PROJECT_SECRET])
+        )
+        print(f"IPFS upload ok")
+        res = client.add_bytes(image_bytes)
+        
+
+        return jsonify({'ipfsHash': res['Hash']}), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to upload image to IPFS'}), 500
 
 @pending_routes.route('/api/mint_confirm/', methods=['POST'])
 def confirm_mint():

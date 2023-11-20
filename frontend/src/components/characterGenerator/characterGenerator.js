@@ -7,7 +7,7 @@ import UnifiedContext from '../../context/UnifiedContext';
 import axios from 'axios';
 //@TO DO Put real INFURA link
 const ipfsClient = create('https://ipfs.infura.io:5001/api/v0');
-const baseLayerPath = process.env.REACT_APP_SPRITES_PATH;
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 
 
 const Options = {
@@ -227,28 +227,18 @@ const CharacterGenerator = () => {
   };
   
   // Function to save an image to IPFS
-  const saveImageToIPFS = async (imageDataUrl) => {
-    try {
-      // Splitting the base64 string and converting it to a binary format
-      const data = imageDataUrl.split(',')[1];
-      const byteCharacters = atob(data);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'image/png' });
-  
-      // Add the image to IPFS
-      const result = await ipfsClient.add(blob);
-      
-      // Return the IPFS path of the uploaded image
-      return result.path;
-    } catch (error) {
-      console.error('Error uploading image to IPFS:', error);
-      throw new Error('Error uploading image to IPFS');
-    }
-  };
+
+
+const saveImageToIPFS = async (imageDataUrl) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/api/upload_to_ipfs/`, {imageData: imageDataUrl});
+
+    return response.data.ipfsHash;
+  } catch (error) {
+    console.error('Error uploading image to IPFS:', error);
+    throw new Error('Error uploading image to IPFS');
+  }
+};
   // Function to save metadata to IPFS
   const saveMetadataToIPFS = async (metadata) => {
   try {
@@ -269,7 +259,7 @@ const CharacterGenerator = () => {
   const createPendingRequest = async (pending_data) => {
     try {
       // Replace with your actual API endpoint
-      const response = await axios.post('/api/mint_request/', { pending_data });
+      const response = await axios.post(`${API_BASE_URL}/api/mint_request/`, { pending_data });
       console.log('Pending request created:', response.data);
       return response.data.id
     } catch (error) {

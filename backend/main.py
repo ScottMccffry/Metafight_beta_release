@@ -6,16 +6,13 @@ from multiprocessing import Process
 #from app import eventListener  # This is your event listener module
 #from websocket import socketio
 from app.routes.websocket import socketio  # Import the SocketIO instance
-
-
-
-scheduler = BackgroundScheduler()
-
-
+from dotenv import load_dotenv
 
 
 app = create_app()
 limiter = Limiter(app)
+load_dotenv()
+scheduler = BackgroundScheduler()
 CORS(app)
 
 if __name__ == '__main__':
