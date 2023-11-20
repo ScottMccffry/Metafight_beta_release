@@ -7,6 +7,8 @@ import UnifiedContext from '../../context/UnifiedContext';
 import axios from 'axios';
 //@TO DO Put real INFURA link
 const ipfsClient = create('https://ipfs.infura.io:5001/api/v0');
+const baseLayerPath = process.env.REACT_APP_SPRITES_PATH;
+
 
 const Options = {
   bodyOptions: ['Body type', 'Shadow', 'Body color', 'Special', 'Wounds', 'Prostheses', 'Lizard'],
@@ -183,24 +185,30 @@ const CharacterGenerator = () => {
   };
 
   const createCombinedImage = async () => {
+    console.log('createcombinedImage 1')
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
+    console.log('createcombinedImage 2')
     canvas.width = 400; // Set the canvas width and height based on your image size
     canvas.height = 400;
-  
+    console.log('createcombinedImage 3')
     const loadImage = (src) => {
+      
       return new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = src;
+        console.log('ok loadImage')
+        img.onerror = () => reject(new Error(`Failed to load image at ${src}`));
+        console.log(`${src}`)
+
+        img.src = src; 
       });
     };
   
     // Helper function to draw the image if the option is not ''
     const drawOption = async (optionType, optionValue, folder) => {
       if (optionValue && optionValue !== '') {
-        const img = await loadImage(`/static/images/${folder}/${optionValue}.png`);
+        const img = await loadImage(`/assets/images/characterGeneratorSprites/${folder}/${optionValue}.png`);
         ctx.drawImage(img, 0, 0);
       }
     };
@@ -221,11 +229,18 @@ const CharacterGenerator = () => {
   // Function to save an image to IPFS
   const saveImageToIPFS = async (imageDataUrl) => {
     try {
+      // Splitting the base64 string and converting it to a binary format
       const data = imageDataUrl.split(',')[1];
-      const buffer = Buffer.from(data, 'base64');
-      
+      const byteCharacters = atob(data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'image/png' });
+  
       // Add the image to IPFS
-      const result = await ipfsClient.add(buffer);
+      const result = await ipfsClient.add(blob);
       
       // Return the IPFS path of the uploaded image
       return result.path;
@@ -234,7 +249,6 @@ const CharacterGenerator = () => {
       throw new Error('Error uploading image to IPFS');
     }
   };
-
   // Function to save metadata to IPFS
   const saveMetadataToIPFS = async (metadata) => {
   try {
@@ -302,11 +316,15 @@ const CharacterGenerator = () => {
             console.error('Wallet is not connected.');
             return;
           }
+          console.log('mint initiated')
           const combinedImageUrl = await createCombinedImage();
+          console.log('mint ok0')
           const ipfsHash = await saveImageToIPFS(combinedImageUrl);
+          console.log('mint ok1')
           const imageIPFSUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
           //console.log(`Minting NFT with fighter: ${fighter}, weapon: ${weapon}, name: ${nftName}, price: ${price}, image: ${imageIPFSUrl}`);
           const characterDescription = generateCharacterDescription();
+          console.log('mint ok2')
           // Create NFT metadata
           const metadata = {
             name: nftName,
@@ -340,6 +358,7 @@ const CharacterGenerator = () => {
           };
 
           const pending_id = createPendingRequest(fighterData);
+          console.log('mint ok3')
           const receipt = await mintNFT(price, metadataIPFSUrl, pending_id, overrides);
           await receipt.wait();
           console.log(`Successfully minted NFT name: ${nftName}, price: ${price}, image: ${imageIPFSUrl}`)
@@ -375,19 +394,20 @@ const CharacterGenerator = () => {
         <div className="w-1/2 relative ml-3">
           
     {/* Add the superposed layers here */}
-    {state.selectedTypes.weaponsType && <img className="absolute" src={`/static/images/weapon/${state.selectedTypes.weaponsType}.png`} alt={state.selectedTypes.weaponsType} />}
-    {state.selectedTypes.bodyType && <img className="absolute" src={`/static/images/body/${state.selectedTypes.bodyType}.png`} alt={state.selectedTypes.bodyType} />}
-    {state.selectedTypes.headType && <img className="absolute" src={`/static/images/head/${state.selectedTypes.headType}.png`} alt={state.selectedTypes.headType} />}
-    {state.selectedTypes.armsType && <img className="absolute" src={`/static/images/arms/${state.selectedTypes.armsType}.png`} alt={state.selectedTypes.armsType} />}
-    {state.selectedTypes.torsoType && <img className="absolute" src={`/static/images/torso/${state.selectedTypes.torsoType}.png`} alt={state.selectedTypes.torsoType} />}
-    {state.selectedTypes.legsType && <img className="absolute" src={`/static/images/legs/${state.selectedTypes.legsType}.png`} alt={state.selectedTypes.legsType} />}
-    {state.selectedTypes.toolsType && <img className="absolute" src={`/static/images/tools/${state.selectedTypes.toolsType}.png`} alt={state.selectedTypes.toolsType} />}
+    {state.selectedTypes.weaponsType && <img className="absolute" src={`/assets/images/characterGeneratorSprites/weapon/${state.selectedTypes.weaponsType}.png`} alt={state.selectedTypes.weaponsType} />}
+    {state.selectedTypes.bodyType && <img className="absolute" src={`/assets/images/characterGeneratorSprites/body/${state.selectedTypes.bodyType}.png`} alt={state.selectedTypes.bodyType} />}
+    {state.selectedTypes.headType && <img className="absolute" src={`/assets/images/characterGeneratorSprites/head/${state.selectedTypes.headType}.png`} alt={state.selectedTypes.headType} />}
+    {state.selectedTypes.armsType && <img className="absolute" src={`/assets/images/characterGeneratorSprites/arms/${state.selectedTypes.armsType}.png`} alt={state.selectedTypes.armsType} />}
+    {state.selectedTypes.torsoType && <img className="absolute" src={`/assets/images/characterGeneratorSprites/torso/${state.selectedTypes.torsoType}.png`} alt={state.selectedTypes.torsoType} />}
+    {state.selectedTypes.legsType && <img className="absolute" src={`/assets/images/characterGeneratorSprites/legs/${state.selectedTypes.legsType}.png`} alt={state.selectedTypes.legsType} />}
+    {state.selectedTypes.toolsType && <img className="absolute" src={`/assets/images/characterGeneratorSprites/tools/${state.selectedTypes.toolsType}.png`} alt={state.selectedTypes.toolsType} />}
     </div>
       </div>
       <div className="text-center mt-4">
         <p>Total Price: {state.price} ETH</p>
-        {/* <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded" onClick={mintNFT}> */}
-        <button  className="mt-2 px-4 py-2 bg-blue-600 text-white rounded" >
+        {/* <button  className="mt-2 px-4 py-2 bg-blue-600 text-white rounded" > */}
+        <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded" onClick={mint}>
+        
           Mint NFT
         </button>
       </div>

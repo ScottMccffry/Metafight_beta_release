@@ -28,11 +28,11 @@ const ModalRegisterUsernamePassword = ({ onClose, onSubmit }) => {
     setFormData({ ...formData, [name]: value });
   };
    // Call this function when the user submits the registration form
-  const onRegistrationSubmit = async (formData) => {
-    formData.preventDefault()
+  const onRegistrationSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
     try {
-      console.log('register')
-      await handleRegistration(formData);
+      console.log('register', formData); // Check what data is being sent
+      handleRegistration(formData);
       // handle additional logic after successful registration if needed
     } catch (error) {
       // Handle registration error

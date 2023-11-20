@@ -11,6 +11,10 @@ user_routes = Blueprint('user_routes', __name__)
 @user_routes.route('/api/user/register', methods=['POST'])
 def register():
     data = request.get_json()
+        # Validate that 'password' key exists
+    if 'password' not in data:
+        print('password missings')
+        return jsonify({"error": "Password is required"}), 400
     password_hash = generate_password_hash(data['password'], method='sha256')
     user = Users(
         username=data['username'], 

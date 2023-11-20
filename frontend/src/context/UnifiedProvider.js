@@ -90,6 +90,8 @@ const UnifiedProvider = ({ children }) => {
     try {
       // You need to implement the API call to register the user here
       // and handle the response accordingly
+      console.log("Registration with password", formData.password);
+
       const response = await axios.post(`${API_BASE_URL}/api/user/register`, {
       username: formData.username,
       password: formData.password,
@@ -153,7 +155,7 @@ const UnifiedProvider = ({ children }) => {
 }}
 
   return (
-    <UnifiedContext.Provider value={{ isAuthenticated, userId,userAddress, isWalletConnected, loginUser, logoutUser, connectWallet }}>
+    <UnifiedContext.Provider value={{ isAuthenticated, userId,userAddress, isWalletConnected, loginUser, logoutUser, connectWallet,handleRegistration }}>
       {children}
       {showRegistrationModal && (
         <ModalRegisterUsernamePassword
