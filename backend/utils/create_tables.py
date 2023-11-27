@@ -26,8 +26,6 @@ with app.app_context():
     from app.models.fight import Fight
     Fight.__table__.create(bind=db.engine)
 
-    
-
     from app.models.fightrequest import FightRequest
     FightRequest.__table__.create(bind=db.engine)
 
@@ -43,3 +41,6 @@ with app.app_context():
 
     from app.models.bids import Bids
     Bids.__table__.create(bind=db.engine)
+    
+    from app.models.pending import Pending
+    Pending.__table__.create(bind=db.engine)

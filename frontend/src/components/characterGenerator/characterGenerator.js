@@ -101,13 +101,16 @@ const reducer = (state, action) => {
 const CharacterGenerator = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { mintNFT } = useContext(BlockchainContext);
+  const [nftName,setNftName] = useState("")
   const {
     isAuthenticated,
     userAddress,
-   
   } = useContext(UnifiedContext);
   const [error, setError] = useState(null);
 
+const handleNftNameChange = (event) => {
+    setNftName(event.target.value);
+  };
   const handleAccordionToggle = (section) => {
     dispatch({ type: 'TOGGLE_ACCORDION', section });
   };
@@ -231,7 +234,7 @@ const CharacterGenerator = () => {
 
 const saveImageToIPFS = async (imageDataUrl) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/api/upload_to_ipfs/`, {imageData: imageDataUrl});
+    const response = await axios.post(`${API_BASE_URL}/api/upload_image_to_ipfs/`, {imageData: imageDataUrl});
 
     return response.data.ipfsHash;
   } catch (error) {
@@ -240,26 +243,38 @@ const saveImageToIPFS = async (imageDataUrl) => {
   }
 };
   // Function to save metadata to IPFS
+  
   const saveMetadataToIPFS = async (metadata) => {
-  try {
-    // Convert metadata object to a JSON string
-    const metadataJson = JSON.stringify(metadata);
-    
-    // Add the metadata to IPFS
-    const result = await ipfsClient.add(metadataJson);
-    
-    // Return the IPFS path of the uploaded metadata
-    return result.path;
-  } catch (error) {
-    console.error('Error uploading metadata to IPFS:', error);
-    throw new Error('Error uploading metadata to IPFS');
-  }
+    try {
+      // Construct a clean metadata object with only serializable values
+      const cleanMetadata = {
+        name: metadata.name, // Ensure this is a string, not an event or complex object
+        description: metadata.description,
+        image: metadata.image
+      };
+  
+      console.log("Clean Metadata:", cleanMetadata);
+  
+      // Convert the clean metadata object to a JSON string
+      const metadataJson = JSON.stringify(cleanMetadata);
+      console.log("Serialized Metadata:", metadataJson);
+
+      // Add the metadata to IPFS
+      const response = await axios.post(`${API_BASE_URL}/api/upload_metadata_to_ipfs/`, { data : metadataJson });
+      console.log("IPFS Upload Result:", response);
+
+      // Return the IPFS path of the uploaded metadata
+      return response.data.ipfsHash
+    } catch (error) {
+      console.error('Error uploading metadata to IPFS:', error);
+      throw new Error('Error uploading metadata to IPFS');
+    }
   };
 
   const createPendingRequest = async (pending_data) => {
     try {
-      // Replace with your actual API endpoint
-      const response = await axios.post(`${API_BASE_URL}/api/mint_request/`, { pending_data });
+      // Replace with your actual API endpointconsole
+      const response = await axios.post(`${API_BASE_URL}/api/mint_request/`, { data: pending_data });
       console.log('Pending request created:', response.data);
       return response.data.id
     } catch (error) {
@@ -324,35 +339,39 @@ const saveImageToIPFS = async (imageDataUrl) => {
           
           //Save metadata to IPFS
           const metadataIPFSHash = await saveMetadataToIPFS(metadata);
+          console.log('mint ok3')
           const metadataIPFSUrl = `https://ipfs.io/ipfs/${metadataIPFSHash}`;
-
+          console.log('mint ok4')
           let price = ethers.parseEther(state.price.toString())
           let overrides = {
             
             from: userAddress,
             value: price,
           }
+          console.log('mint ok5')
           // Prepare the fighter data to be sent to the backend
           const fighterData = {
-            name: nftName, // The name of the NFT
+            name: nftName || 'yolo', // The name of the NFT
             collection_address: 'COLLECTION_ADDRESS_HERE', // Placeholder for collection address
             image: imageIPFSUrl, // URL of the image on IPFS
-            owner_nft_address: 'OWNER_NFT_ADDRESS_HERE', // Placeholder for owner's NFT address
+            owner_nft_address: userAddress, // Placeholder for owner's NFT address
             // The NFT address will be available after minting, so initially, it can be empty or a placeholder
             nft_address: 'NFT_ADDRESS_TO_BE_UPDATED_AFTER_MINTING',
             // You may want to include the entire metadata or specific parts of it
-            game_characteristics_json: JSON.stringify(metadata),
+            game_characteristics_json: JSON.stringify(metadata) || 'yolo',
             handler: 'HANDLER_INFORMATION_HERE', // Placeholder for handler information
             rank: 'RANK_INFORMATION_HERE', // Placeholder for rank information
             // Add any other relevant fields that are required for the fighter
           };
 
-          const pending_id = createPendingRequest(fighterData);
-          console.log('mint ok3')
-          const receipt = await mintNFT(price, metadataIPFSUrl, pending_id, overrides);
+          const pending_id = await createPendingRequest(fighterData);
+          console.log(pending_id);
+          console.log('mint ok6');
+          //pouruoi pending_id
+          const receipt = mintNFT(price, metadataIPFSUrl, pending_id, overrides);
           await receipt.wait();
-          console.log(`Successfully minted NFT name: ${nftName}, price: ${price}, image: ${imageIPFSUrl}`)
-          console.log('waiting for confirmation to pending DB')
+          console.log(`Successfully minted NFT name: ${nftName}, price: ${price}, image: ${imageIPFSUrl}`);
+          console.log('waiting for confirmation to pending DB');
         }
         catch(err) {
           setError(err.message);
@@ -371,7 +390,7 @@ const saveImageToIPFS = async (imageDataUrl) => {
           type="text"
           id="nftName"
           value={initialState.nftName}
-          //onChange={handleNftNameChange}
+          onChange={handleNftNameChange}
           className="w-1/2 px-3 py-2 bg-gray-800 text-white border rounded"
         />
       </div>
@@ -396,7 +415,7 @@ const saveImageToIPFS = async (imageDataUrl) => {
       <div className="text-center mt-4">
         <p>Total Price: {state.price} ETH</p>
         {/* <button  className="mt-2 px-4 py-2 bg-blue-600 text-white rounded" > */}
-        <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded" onClick={mint}>
+        <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded" onClick={() => mint(nftName)}>
         
           Mint NFT
         </button>

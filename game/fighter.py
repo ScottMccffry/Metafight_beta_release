@@ -1,5 +1,6 @@
 import pygame
 import json
+from ai_behaviour import AIBehaviour
 
 # Define constants for readability and ease of configuration
 ANIMATION_COOLDOWN = 50
@@ -26,18 +27,35 @@ class Fighter(pygame.sprite.Sprite):
         sprite_sheet = pygame.image.load(fighter_def['sprite_sheet']).convert_alpha()
         self.animation_list = self._load_images(sprite_sheet, fighter_def['animation_steps'], fighter_def['size'], fighter_def['scale'])
         
+        self.player = player
+        self.fighter_id=player
         # Initialize fighter attributes
         self.player = player
         self.size = fighter_def['size']
         self.offset = fighter_def['offset']
+        self.image_scale = fighter_def['scale']
         self.flip = flip
         self.rect = pygame.Rect((x, y, 80, 180))
         self.action = 0
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]
         self.update_time = pygame.time.get_ticks()
-        self.vel_y = 0
-        self.reset()
+        self.vel_y = 0    
+        
+
+        
+        self.running = False
+        self.jump = False
+        self.attacking = False
+        self.attack_type = 0
+        self.running = False
+        self.attack_cooldown = 0
+        self.jump_cooldown_1 = 0
+        self.health = 100
+        self.hit = False
+       
+
+        
         self.attack_sound = pygame.mixer.Sound(fighter_def['sound'])
         self.mask = pygame.mask.from_surface(self.image)
         self._load_config(fighter_def_file)
@@ -111,59 +129,40 @@ class Fighter(pygame.sprite.Sprite):
         
         @param target: pygame.Rect, the opponent's rect attribute to determine their position.
         """
-        if self.rect.x < target.x:
+        if self.rect.x < target.rect.x:
             self.flip = False
-        elif self.rect.x > target.x:
+        elif self.rect.x > target.rect.x:
             self.flip = True
-
-    def update(self, target, screen_width, screen_height):
-        # Reset action variable
-        action = 0
-        
-        # Set cooldown variables
-        ATTACK_COOLDOWN = 20 if self.attack_type == 'major' else MINOR_ATTACK_COOLDOWN
-        
+    
+    def update(self):
+        """
+        Updates the fighter's state and animations.
+        """
+        # Apply gravity
+        GRAVITY = 2
+        self.vel_y += GRAVITY
+        new_action=0
         # Check alive status
-        if self.alive:
-            # Check for attack cooldown
-            if self.attack:
-                if pygame.time.get_ticks() - self.attack_time > ATTACK_COOLDOWN:
-                    self.attack = False
-                    self.frame_index = 0
-                action = 4
-            else:
-                # Move player and apply gravity
-                keys = pygame.key.get_pressed()
-                dx, dy = self.move(keys, screen_width, screen_height)
-                self.rect.x += dx
-                self.rect.y += dy
-                
-                # Handle orientation
-                self._face_opponent(target.rect)
-                
-                # Update actions
-                if dy < 0:
-                    action = 3  # Jumping
-                elif dy > 1:
-                    action = 2  # Falling
-                elif dx != 0:
-                    action = 1  # Running
-                else:
-                    action = 0  # Idle
-        else:
-            action = 5  # Dead
-            self.image = self.animation_list[action][0]
-            if pygame.time.get_ticks() - self.death_time > 3000:
-                self.kill()
-                
-        # Handle AI behaviour
-        if self.ai:
-            action = self.ai_behaviour.update(target, action)
-            
-        # Handle animations
-        self._handle_animations(action)
-        self.update_time = pygame.time.get_ticks()
+        if self.health <= 0:
+            self.health = 0
+            self.alive = False
+            new_action = 6  # 6: death
+        elif self.hit:
+            new_action = 5  # 5: hit
+        elif self.attacking:
+            new_action = 3 if self.attack_type == 1 else 4  # 3: attack1, 4: attack2
+        elif self.jump:
+            new_action = 2  # 2: jump
+        elif self.running:
+            new_action = 1  # 1: run
 
+    # Update action if it has changed
+        if new_action != self.action:
+            self.update_action(new_action)
+        self._handle_animations(new_action)
+
+        # Update animations
+        
     def _handle_animations(self, action):
         """
         @DEV
@@ -176,6 +175,7 @@ class Fighter(pygame.sprite.Sprite):
         # Update frame index
         if pygame.time.get_ticks() - self.update_time > animation_cooldown:
             self.frame_index += 1
+            self.update_time = pygame.time.get_ticks()
             
         # Reset animation
         if self.frame_index >= len(self.animation_list[action]):
@@ -187,6 +187,7 @@ class Fighter(pygame.sprite.Sprite):
         # Set action and update image
         self.action = action
         self.image = self.animation_list[action][self.frame_index]
+        self.mask = pygame.mask.from_surface(self.image)
         if self.flip:
             self.image = pygame.transform.flip(self.image, True, False)
 
@@ -211,39 +212,34 @@ class Fighter(pygame.sprite.Sprite):
         self.attack_time = pygame.time.get_ticks()
         self.attack_sound.play()
 
-    def move(self, keys, screen_width, screen_height):
+    def move(self, screen_width, screen_height, target, round_over):
         """
-        @DEV
-        Handle movement and jumping of the fighter.
-        
-        @param keys: list of bool, the current state of all keyboard keys.
-        @param screen_width: int, the width of the screen.
-        @parama screen_height: int, the height of the screen.
-        @return: tuple of (int, int), the change in x and y coordinates.
+        Executes movement based on the AI's combat behavior decisions.
         """
-        # Initialize change in position
-        dx = 0
-        dy = 0
-
-        # Handle movement
-        if keys[self.move_left]:
-            dx = -SPEED
-        if keys[self.move_right]:
-            dx = SPEED
-        if keys[self.move_up] and not self.jump:
-            self.vel_y = -30
-            self.jump = True
-            
-        # Handle gravity
+        # Apply gravity
         self.vel_y += GRAVITY
-        if self.vel_y > 10:
-            self.vel_y
-        dy += self.vel_y
+        dy = self.vel_y
 
-        # Ensure the player stays on screen
-        dx, dy = self._ensure_on_screen(dx, dy, screen_width, screen_height)
+        # Initialize horizontal movement
+        dx = 0
 
-        return dx, dy
+        # If the round is not over and the fighter is alive, update movement based on AI decisions
+        if not round_over and self.alive:
+            # Call combat_behaviour to get AI decisions
+            dx, ai_dy = self.ai_behaviour.combat_behaviour(target)
+            dy += ai_dy  # Incorporate vertical movement decided by AI
+
+            # Ensure the fighter stays on screen
+            dx, dy = self._ensure_on_screen(dx, dy, screen_width, screen_height)
+
+            # Ensure fighters face each other
+            self._face_opponent(target)
+
+           
+
+        # Update player position based on AI decisions
+        self.rect.x += dx
+        self.rect.y += dy
 
     def reset(self):
         """
@@ -257,18 +253,6 @@ class Fighter(pygame.sprite.Sprite):
         self.attack_type = 'major'
         self.jump = False
 
-    def take_hit(self, damage):
-        """
-        @DEV
-        Handle the fighter taking damage.
-        
-        @param damage: int, the amount of damage to be taken.
-        """
-        self.health -= damage
-        if self.health <= 0:
-            self.alive = False
-            self.death_time = pygame.time.get_ticks()
-
     def draw(self, surface):
         """
         @DEV
@@ -276,9 +260,14 @@ class Fighter(pygame.sprite.Sprite):
         
         @param surface: pygame.Surface, the surface to draw the fighter on.
         """
-        surface.blit(self.image, (self.rect.x - self.offset[0], self.rect.y - self.offset[1]))
+        surface.blit(self.image, (self.rect.x  - (self.offset[0] * self.image_scale), self.rect.y - (self.offset[1] * self.image_scale)))
         pygame.draw.rect(surface, (255, 0, 0), self.rect, 2)
 
-# Example usage
-fighter1 = Fighter(1, 100, 100, False, 'fighter1_def.json')
-fighter2 = Fighter(2, 300, 100, True, 'fighter2_def.json')
+    def update_action(self, new_action):
+     #check if the new action is different to the previous one
+        if new_action != self.action:
+            self.action = new_action
+            #update the animation settings
+            self.frame_index = 0
+            self.update_time = pygame.time.get_ticks()
+

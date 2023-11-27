@@ -6,7 +6,7 @@ class Pending(db.Model):
     __tablename__ = 'pending'
 
     id = db.Column(db.Integer, primary_key=True)
-    nft_address= db.Column(db.String(50), nullable=False, unique=True)
+    nft_address= db.Column(db.String(50), nullable=False)# add Unique if necessary, unique=True)
     data_to_validate = db.Column(db.JSON, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     request_type = db.Column(db.Integer)
@@ -24,15 +24,16 @@ class Pending(db.Model):
         self.status = 'confirmed'
         db.session.commit()
         return self.id
-
-    def rollback_mint(self,pending_id):
+    
+    @staticmethod
+    def rollback_mint(pending_id):
         # Logic to rollback the mint if necessary
         pending_entry = Pending.query.get(pending_id)
         if pending_entry:
             # Update the mint entry to reflect the rollback
-            pending_entry.status = 'rollback'
+            db.session.delete(pending_entry)
             db.session.commit()
-
+            
     def update_pending_mint_status(mint_id, status):
         pending_mint = Pending.query.get(mint_id)
         if pending_mint:

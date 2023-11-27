@@ -6,7 +6,11 @@ class CustomSpriteGroup(pygame.sprite.Group):
 
     def draw(self, surface):
         for sprite in self.sprites():
-            sprite.draw(surface)
+            if hasattr(sprite, 'draw'):
+                sprite.draw(surface)
+            else:
+                print(f"Warning: Object {sprite} does not have a draw method.")
+                
             
     def reset(self):
         for sprite in self.sprites():

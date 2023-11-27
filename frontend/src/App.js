@@ -9,6 +9,7 @@ import LiveFeed from './pages/liveFeed/liveFeed';
 import Fight from './pages/fight/fight';
 import styles from './App.css' // Importing CSS for the app
 import UnifiedProvider from './context/UnifiedProvider';
+import BlockchainProvider from './context/BlockchainProvider'
 import MintingPage from './pages/minting/minting';
 import Profile from './pages/profile/profile';
 import Stacking from './pages/staking/staking';
@@ -20,12 +21,13 @@ import { SocketProvider } from './context/SocketContext';
 import { useEffect, useState } from 'react';
 
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
+
 function App() {
 
   return (
    <UnifiedProvider>
         <SocketProvider>
+          <BlockchainProvider>
         <Router>
           <body className="text-zinc-200 w-screen h-full">
             <SideBarLeft />
@@ -46,6 +48,7 @@ function App() {
           {/* Adding script for styling */}
           <script src="../../node_modules/flowbite/dist/flowbite.min.js"></script>
         </Router>
+        </BlockchainProvider>
         </SocketProvider>
   </UnifiedProvider>
   );

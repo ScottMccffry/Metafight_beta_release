@@ -7,7 +7,6 @@ from game_config import *
 import json
 from custom_sprite_group import CustomSpriteGroup
 
-
 mixer.init()
 pygame.init()
 
@@ -17,7 +16,7 @@ pygame.display.set_caption("Brawler")
 
 # Set framerate
 clock = pygame.time.Clock()
-FPS = 60
+FPS = 50
 
 # Load music and sounds
 pygame.mixer.music.load(music_path)
@@ -53,7 +52,7 @@ fighter_2 = Fighter(2, 700, 310, True, 'wizard.def')
 all_fighters = CustomSpriteGroup()
 all_fighters.add(fighter_1, fighter_2)
 
-
+""""
 def send_score_to_server(player, score):
     # Define the API endpoint
     url = '<https://gameapi.com/savescore>'
@@ -61,8 +60,8 @@ def send_score_to_server(player, score):
     # Define the data payload. This may vary depending on the API's requirements.
     data = {
         'player': player,
-        'score': sco
-class AIBehaviour:re
+        'score': score,
+        class AIBehaviour:
     }
 
     # Send a POST request with the data
@@ -73,7 +72,7 @@ class AIBehaviour:re
         print("Score sent successfully!")
     else:
         print("Failed to send score. Response:", response.text)
-
+"""
 
 # Game loop
 last_count_update = pygame.time.get_ticks()
